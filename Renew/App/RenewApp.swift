@@ -14,6 +14,7 @@ struct RenewApp: App {
             RootView()
                 .environmentObject(environment.state)
                 .environmentObject(environment.container)
+                .preferredColorScheme(.light)
         }
     }
 }
@@ -34,11 +35,11 @@ struct RootView: View {
         .onAppear {
             AppLogger.lifecycle.debug("RootView appeared - isSignedIn: \(state.isSignedIn), onboarding: \(state.shouldShowOnboarding)")
         }
-        .onChange(of: state.isSignedIn) { newValue in
-            AppLogger.lifecycle.debug("RootView state.isSignedIn changed: \(newValue)")
+        .onChange(of: state.isSignedIn) { oldValue, newValue in
+            AppLogger.lifecycle.debug("RootView state.isSignedIn changed: \(oldValue) -> \(newValue)")
         }
-        .onChange(of: state.shouldShowOnboarding) { newValue in
-            AppLogger.lifecycle.debug("RootView shouldShowOnboarding changed: \(newValue)")
+        .onChange(of: state.shouldShowOnboarding) { oldValue, newValue in
+            AppLogger.lifecycle.debug("RootView shouldShowOnboarding changed: \(oldValue) -> \(newValue)")
         }
         .animation(.easeInOut, value: state.isSignedIn)
         .animation(.easeInOut, value: state.shouldShowOnboarding)

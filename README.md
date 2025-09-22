@@ -3,7 +3,7 @@
 Renew is an iOS & iPadOS SwiftUI app that helps burned-out professionals reclaim energy through the "Core 4" habits: screen time, sunlight, steps, and sleep. The app layers journaling, learning modules, analytics, and a 3-day premium trial on top of a calm, glassmorphic design system.
 
 ## Highlights
-- **SwiftUI-first architecture** with feature modules (`Today`, `Journal`, `Learning`, `Analytics`, `Settings`).
+- **SwiftUI-first architecture** with feature modules (`Today`, `Journal`, `Learning`, `Journey`, `Settings`).
 - **Onboarding flow** for goals, HealthKit permissions, notification opt-in, and StoreKit trial activation.
 - **Service layer** wrapping Supabase, HealthKit, Screen Time, StoreKit, and notifications (stubbed for now).
 - **Combine-powered stores** to keep UI reactive and testable.
@@ -16,8 +16,8 @@ Renew/
 ├─ Auth/               # Auth gate screen + view model
 ├─ Onboarding/         # Multi-step onboarding implementation
 ├─ Tabs/               # Main tab container
-├─ Features/           # Today, Journal, Learning, Analytics, Settings modules
-├─ Services/           # Auth, Habit, Journal, Learning, Subscription, Notification, Analytics services
+├─ Features/           # Today, Journal, Learning, Journey, Settings modules
+├─ Services/           # Auth, Habit, Journal, Learning, Subscription, Notification, Journey services
 ├─ Models/             # Shared data models and value types
 ├─ Support/            # Styling helpers, Info.plist
 └─ Resources/          # Asset catalog (AppIcon placeholder)
@@ -44,7 +44,7 @@ xcodebuild -scheme Renew -configuration Debug -destination 'platform=iOS Simulat
 ## Current Limitations
 - Service implementations are mocked. Supabase, HealthKit, StoreKit, and Screen Time integrations return sample data.
 - Notification scheduling requests authorization but does not handle denied states yet.
-- Analytics and streak logic use placeholder values.
+- Journey and streak logic use placeholder values.
 - No automated test targets yet (unit & UI).
 
 ## Recommended Next Steps

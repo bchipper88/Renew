@@ -7,7 +7,7 @@ final class AppContainer: ObservableObject {
     let journalService: JournalService
     let learningService: LearningService
     let notificationScheduler: NotificationScheduler
-    let analyticsService: AnalyticsService
+    let journeyService: JourneyService
 
     init(services: ServiceFactory = ServiceFactory()) {
         self.authService = services.authService
@@ -16,7 +16,7 @@ final class AppContainer: ObservableObject {
         self.journalService = services.journalService
         self.learningService = services.learningService
         self.notificationScheduler = services.notificationScheduler
-        self.analyticsService = services.analyticsService
+        self.journeyService = services.journeyService
     }
 }
 
@@ -27,7 +27,7 @@ struct ServiceFactory {
     let journalService: JournalService
     let learningService: LearningService
     let notificationScheduler: NotificationScheduler
-    let analyticsService: AnalyticsService
+    let journeyService: JourneyService
 
     init() {
         let auth = AuthService()
@@ -37,6 +37,6 @@ struct ServiceFactory {
         self.journalService = JournalService()
         self.learningService = LearningService()
         self.notificationScheduler = NotificationScheduler()
-        self.analyticsService = AnalyticsService()
+        self.journeyService = JourneyService()
     }
 }

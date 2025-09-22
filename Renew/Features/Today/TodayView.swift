@@ -239,13 +239,13 @@ private struct CharacterIllustration: View {
 
     private var selectedImage: UIImage? {
         switch completion {
-        case ..<0.25:
+        case ..<0.26:
             return UIImage(named: sleepyImageName)
-        case 0.25..<0.5:
+        case 0.26..<0.75:
             return UIImage(named: steadyImageName)
-        case 0.5..<0.8:
+        case 0.75..<0.9:
             return UIImage(named: happyImageName)
-        case 0.8...:
+        case 0.9...:
             return UIImage(named: energizedImageName)
         default:
             return nil
@@ -473,9 +473,10 @@ private enum TodayProgressCalculator {
         switch type {
         case .screenTime:
             if metric.progress <= metric.target { return 1 }
-            let overage = metric.progress - metric.target
-            let penalty = overage / metric.target
-            return max(0, 1 - penalty)
+            let minutesOver = max(metric.progress - metric.target, 0)
+            let halfHourChunks = Int(ceil(minutesOver / 30))
+            let penalty = Double(halfHourChunks) * 5
+            return max(0, 1 - penalty / 100)
         default:
             return min(metric.progress / metric.target, 1)
         }

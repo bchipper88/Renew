@@ -17,7 +17,7 @@
 		F6A8BC912A5B4A9400F87E0E /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC672A5B4A9400F87E0E /* TodayView.swift */; };
 		F6A8BC922A5B4A9400F87E0E /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC682A5B4A9400F87E0E /* JournalView.swift */; };
 		F6A8BC932A5B4A9400F87E0E /* LearningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC692A5B4A9400F87E0E /* LearningView.swift */; };
-		F6A8BC942A5B4A9400F87E0E /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC6A2A5B4A9400F87E0E /* AnalyticsView.swift */; };
+		F6A8BC942A5B4A9400F87E0E /* JourneyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC6A2A5B4A9400F87E0E /* JourneyView.swift */; };
 		F6A8BC952A5B4A9400F87E0E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC6B2A5B4A9400F87E0E /* SettingsView.swift */; };
 		F6A8BC962A5B4A9400F87E0E /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC6C2A5B4A9400F87E0E /* Models.swift */; };
 		F6A8BC972A5B4A9400F87E0E /* Styles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC6D2A5B4A9400F87E0E /* Styles.swift */; };
@@ -27,7 +27,7 @@
 		F6A8BC9B2A5B4A9400F87E0E /* NotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC712A5B4A9400F87E0E /* NotificationScheduler.swift */; };
 		F6A8BC9C2A5B4A9400F87E0E /* LearningService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC722A5B4A9400F87E0E /* LearningService.swift */; };
 		F6A8BC9D2A5B4A9400F87E0E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC732A5B4A9400F87E0E /* AuthService.swift */; };
-		F6A8BC9E2A5B4A9400F87E0E /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC742A5B4A9400F87E0E /* AnalyticsService.swift */; };
+		F6A8BC9E2A5B4A9400F87E0E /* JourneyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC742A5B4A9400F87E0E /* JourneyService.swift */; };
 		F6A8BC9F2A5B4A9400F87E0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F6A8BC762A5B4A9400F87E0E /* Assets.xcassets */; };
 		F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift */ = {isa = PBXBuildFile; fileRef = F6A8BCD12A5B4A9400F87E0E /* AppLogger.swift */; };
 /* End PBXBuildFile section */
@@ -43,7 +43,7 @@
 		F6A8BC672A5B4A9400F87E0E /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		F6A8BC682A5B4A9400F87E0E /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		F6A8BC692A5B4A9400F87E0E /* LearningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningView.swift; sourceTree = "<group>"; };
-		F6A8BC6A2A5B4A9400F87E0E /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
+		F6A8BC6A2A5B4A9400F87E0E /* JourneyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyView.swift; sourceTree = "<group>"; };
 		F6A8BC6B2A5B4A9400F87E0E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F6A8BC6C2A5B4A9400F87E0E /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		F6A8BC6D2A5B4A9400F87E0E /* Styles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Styles.swift; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		F6A8BC712A5B4A9400F87E0E /* NotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScheduler.swift; sourceTree = "<group>"; };
 		F6A8BC722A5B4A9400F87E0E /* LearningService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningService.swift; sourceTree = "<group>"; };
 		F6A8BC732A5B4A9400F87E0E /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
-		F6A8BC742A5B4A9400F87E0E /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		F6A8BC742A5B4A9400F87E0E /* JourneyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JourneyService.swift; sourceTree = "<group>"; };
 		F6A8BC752A5B4A9400F87E0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F6A8BC762A5B4A9400F87E0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F6A8BC772A5B4A9400F87E0E /* Renew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Renew.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,7 +136,7 @@
 				F6A8BC4D2A5B4A9400F87E0E /* Today */,
 				F6A8BC4E2A5B4A9400F87E0E /* Journal */,
 				F6A8BC4F2A5B4A9400F87E0E /* Learning */,
-				F6A8BC502A5B4A9400F87E0E /* Analytics */,
+				F6A8BC502A5B4A9400F87E0E /* Journey */,
 				F6A8BC512A5B4A9400F87E0E /* Settings */,
 			);
 			path = Features;
@@ -166,12 +166,12 @@
 			path = Learning;
 			sourceTree = "<group>";
 		};
-		F6A8BC502A5B4A9400F87E0E /* Analytics */ = {
+		F6A8BC502A5B4A9400F87E0E /* Journey */ = {
 			isa = PBXGroup;
 			children = (
-				F6A8BC6A2A5B4A9400F87E0E /* AnalyticsView.swift */,
+				F6A8BC6A2A5B4A9400F87E0E /* JourneyView.swift */,
 			);
-			path = Analytics;
+			path = Journey;
 			sourceTree = "<group>";
 		};
 		F6A8BC512A5B4A9400F87E0E /* Settings */ = {
@@ -191,7 +191,7 @@
 				F6A8BC6E2A5B4A9400F87E0E /* JournalService.swift */,
 				F6A8BC722A5B4A9400F87E0E /* LearningService.swift */,
 				F6A8BC712A5B4A9400F87E0E /* NotificationScheduler.swift */,
-				F6A8BC742A5B4A9400F87E0E /* AnalyticsService.swift */,
+				F6A8BC742A5B4A9400F87E0E /* JourneyService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -301,11 +301,11 @@
 			files = (
 				F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift */,
 				F6A8BC982A5B4A9400F87E0E /* JournalService.swift in Sources */,
-				F6A8BC9E2A5B4A9400F87E0E /* AnalyticsService.swift in Sources */,
+				F6A8BC9E2A5B4A9400F87E0E /* JourneyService.swift in Sources */,
 				F6A8BC912A5B4A9400F87E0E /* TodayView.swift in Sources */,
 				F6A8BC9C2A5B4A9400F87E0E /* LearningService.swift in Sources */,
 				F6A8BC952A5B4A9400F87E0E /* SettingsView.swift in Sources */,
-				F6A8BC942A5B4A9400F87E0E /* AnalyticsView.swift in Sources */,
+				F6A8BC942A5B4A9400F87E0E /* JourneyView.swift in Sources */,
 				F6A8BC8E2A5B4A9400F87E0E /* AuthGateView.swift in Sources */,
 				F6A8BC8B2A5B4A9400F87E0E /* AppContainer.swift in Sources */,
 				F6A8BC932A5B4A9400F87E0E /* LearningView.swift in Sources */,

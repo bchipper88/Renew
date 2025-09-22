@@ -5,7 +5,7 @@ Renew is an iOS and iPadOS SwiftUI application that guides burned-out profession
 
 ## Core Principles
 - **State-first design**: Observable view models backed by Combine publishers and Supabase live queries keep the UI reactive and resilient to offline states.
-- **Modular features**: Each tab (Today, Journal, Learning, Analytics, Settings) owns its view hierarchy, view models, and data access layer built on shared services.
+- **Modular features**: Each tab (Today, Journal, Learning, Journey, Settings) owns its view hierarchy, view models, and data access layer built on shared services.
 - **Task-oriented onboarding**: Authentication, permissions, and subscription trial happen in a guided flow that collects user goals and entitlements before unlocking the main tabs.
 - **Privacy & security**: Supabase policies enforce per-user data access. Sensitive state (sessions, tokens) is stored securely in the keychain.
 
@@ -59,7 +59,7 @@ AppContainer
 ├── HabitStore
 ├── JournalStore
 ├── LearningStore
-└── AnalyticsService
+└── JourneyService
 ```
 - `AppContainer` created at launch and injected into environment.
 - Stores expose `@Published` state for features via `ObservableObject` wrappers.

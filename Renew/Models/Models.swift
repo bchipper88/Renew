@@ -90,10 +90,10 @@ struct HabitLog: Identifiable, Codable {
             id: UUID(),
             date: date,
             metrics: [
-                .screenTime: HabitMetric(target: 120, progress: 75),
-                .sunlight: HabitMetric(target: 15, progress: 10),
-                .steps: HabitMetric(target: 10_000, progress: 6_250),
-                .sleep: HabitMetric(target: 7 * 60, progress: 6 * 60 + 30)
+                .screenTime: HabitMetric(target: 120, progress: 0),
+                .sunlight: HabitMetric(target: 15, progress: 0),
+                .steps: HabitMetric(target: 10_000, progress: 0),
+                .sleep: HabitMetric(target: 7 * 60, progress: 0)
             ],
             shutdownDone: false
         )
@@ -152,7 +152,7 @@ struct LearningArticle: Identifiable, Codable, Hashable {
     )
 }
 
-struct AnalyticsSnapshot: Identifiable, Codable {
+struct JourneySnapshot: Identifiable, Codable {
     var id: UUID
     var dateRangeDescription: String
     var core4CompletionRate: Double
@@ -160,7 +160,7 @@ struct AnalyticsSnapshot: Identifiable, Codable {
     var averageEnergy: Double
     var longestStreak: Int
 
-    static let weekly = AnalyticsSnapshot(
+    static let weekly = JourneySnapshot(
         id: UUID(),
         dateRangeDescription: "This Week",
         core4CompletionRate: 0.57,
@@ -168,6 +168,18 @@ struct AnalyticsSnapshot: Identifiable, Codable {
         averageEnergy: 3.8,
         longestStreak: 3
     )
+}
+
+struct DailyJourneyScore: Identifiable, Codable, Hashable {
+    var id: UUID
+    var date: Date
+    var score: Double
+
+    init(id: UUID = UUID(), date: Date, score: Double) {
+        self.id = id
+        self.date = date
+        self.score = score
+    }
 }
 
 struct AuthSession: Codable {
