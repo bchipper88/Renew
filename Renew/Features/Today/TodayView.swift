@@ -72,7 +72,7 @@ private struct TodayDateHeader: View {
                 .foregroundStyle(.secondary)
         }
         .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
@@ -234,6 +234,7 @@ private struct CharacterIllustration: View {
 
     private let sleepyImageName = "sleepyBot"
     private let steadyImageName = "steadyBot"
+    private let happyImageName = "happyBot"
     private let energizedImageName = "energizedBot"
 
     private var selectedImage: UIImage? {
@@ -242,6 +243,8 @@ private struct CharacterIllustration: View {
             return UIImage(named: sleepyImageName)
         case 0.25..<0.5:
             return UIImage(named: steadyImageName)
+        case 0.5..<0.8:
+            return UIImage(named: happyImageName)
         case 0.8...:
             return UIImage(named: energizedImageName)
         default:
