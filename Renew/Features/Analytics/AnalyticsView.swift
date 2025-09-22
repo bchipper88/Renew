@@ -16,8 +16,10 @@ struct AnalyticsView: View {
                 }
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
             .navigationTitle("Analytics")
         }
+        .background(GradientBackground())
         .task {
             await viewModel.connect(container: container)
         }

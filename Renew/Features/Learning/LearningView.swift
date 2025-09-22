@@ -18,11 +18,13 @@ struct LearningView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .navigationTitle("Learning")
             .navigationDestination(for: LearningArticle.self) { article in
                 LearningDetailView(article: article)
             }
         }
+        .background(GradientBackground())
         .task {
             await viewModel.connect(container: container)
         }

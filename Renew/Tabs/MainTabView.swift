@@ -5,10 +5,6 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            TodayView()
-                .tabItem { Label(MainTab.today.title, systemImage: MainTab.today.icon) }
-                .tag(MainTab.today)
-
             JournalView()
                 .tabItem { Label(MainTab.journal.title, systemImage: MainTab.journal.icon) }
                 .tag(MainTab.journal)
@@ -16,6 +12,10 @@ struct MainTabView: View {
             LearningView()
                 .tabItem { Label(MainTab.learning.title, systemImage: MainTab.learning.icon) }
                 .tag(MainTab.learning)
+
+            TodayView()
+                .tabItem { Label(MainTab.today.title, systemImage: MainTab.today.icon) }
+                .tag(MainTab.today)
 
             AnalyticsView()
                 .tabItem { Label(MainTab.analytics.title, systemImage: MainTab.analytics.icon) }

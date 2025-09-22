@@ -14,6 +14,7 @@ struct JournalView: View {
                 }
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
             .navigationTitle("Journal")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -29,6 +30,7 @@ struct JournalView: View {
                 }
             }
         }
+        .background(GradientBackground())
         .task {
             await viewModel.connect(container: container)
         }

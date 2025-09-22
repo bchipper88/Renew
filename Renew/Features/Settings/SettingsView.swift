@@ -42,8 +42,10 @@ struct SettingsView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .navigationTitle("Settings")
         }
+        .background(GradientBackground())
     }
 }
 
