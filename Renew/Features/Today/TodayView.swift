@@ -207,13 +207,11 @@ struct TodayProgressHeader: View {
                 }
             }
 
-            Text(
-                clampedCompletion >= 1
-                    ? "You're done! Celebrate the win and rest easy."
-                    : "Finish your remaining habits to close out the day."
-            )
-            .font(.footnote.weight(.semibold))
-            .foregroundStyle(.white.opacity(0.85))
+            if clampedCompletion >= 1 {
+                Text("You're done! Celebrate the win and rest easy.")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.85))
+            }
         }
         .padding(24)
         .padding(.trailing, 148)

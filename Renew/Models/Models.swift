@@ -30,6 +30,8 @@ enum CoreHabitType: String, CaseIterable, Identifiable, Codable {
 struct UserProfile: Identifiable, Codable {
     let id: UUID
     var email: String
+    var displayName: String
+    var avatarImageData: Data?
     var goals: [CoreHabitType]
     var notificationSettings: NotificationSettings
     var subscriptionStatus: SubscriptionStatus
@@ -37,6 +39,8 @@ struct UserProfile: Identifiable, Codable {
     static let placeholder = UserProfile(
         id: UUID(),
         email: "user@example.com",
+        displayName: "Renew Explorer",
+        avatarImageData: nil,
         goals: CoreHabitType.allCases,
         notificationSettings: .allEnabled,
         subscriptionStatus: .trial(daysRemaining: 3)
@@ -130,8 +134,8 @@ struct JournalEntry: Identifiable, Codable {
             purposeNote: "Helping a teammate unblock their work.",
             gratitudeNote: "Sunshine during lunch.",
             moodScore: 3,
-            energyScore: 4,
-            burnoutScore: nil
+            energyScore: 7,
+            burnoutScore: 3
         )
     }
 }
@@ -139,17 +143,57 @@ struct JournalEntry: Identifiable, Codable {
 struct LearningArticle: Identifiable, Codable, Hashable {
     var id: UUID
     var title: String
-    var bodyMarkdown: String
-    var isPremium: Bool
+    var summary: String
+    var articleMarkdown: String
+    var category: LearningCategory
+    var imageName: String
+    var references: [LearningReference]
 
     static let sample = LearningArticle(
         id: UUID(),
         title: "Sunlight and Your Circadian Rhythm",
-        bodyMarkdown: """
+        summary: "Morning light is the anchor for hormonal balance and energy.",
+        articleMarkdown: """
         Exposure to natural light anchors your circadian rhythm. Aim for 15 minutes of morning sunlight to boost energy and sleep quality.
         """,
-        isPremium: false
+        category: .favorites,
+        imageName: "energizedBot",
+        references: [
+            LearningReference(
+                title: "Morning light exposure for circadian entrainment",
+                url: URL(string: "https://pubmed.ncbi.nlm.nih.gov/000000")!
+            )
+        ]
     )
+}
+
+struct LearningReference: Identifiable, Codable, Hashable {
+    var id: UUID
+    var title: String
+    var url: URL
+
+    init(id: UUID = UUID(), title: String, url: URL) {
+        self.id = id
+        self.title = title
+        self.url = url
+    }
+}
+
+enum LearningCategory: String, Codable, CaseIterable, Hashable {
+    case favorites
+    case supplements
+    case concepts
+
+    var title: String {
+        switch self {
+        case .favorites:
+            return "My Favorites"
+        case .supplements:
+            return "Supplements"
+        case .concepts:
+            return "Concepts"
+        }
+    }
 }
 
 struct JourneySnapshot: Identifiable, Codable {
