@@ -29,7 +29,7 @@
 		F6A8BC9D2A5B4A9400F87E0E /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC732A5B4A9400F87E0E /* AuthService.swift */; };
 		F6A8BC9E2A5B4A9400F87E0E /* JourneyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC742A5B4A9400F87E0E /* JourneyService.swift */; };
 		F6A8BC9F2A5B4A9400F87E0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F6A8BC762A5B4A9400F87E0E /* Assets.xcassets */; };
-		F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift */ = {isa = PBXBuildFile; fileRef = F6A8BCD12A5B4A9400F87E0E /* AppLogger.swift */; };
+		F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BCD12A5B4A9400F87E0E /* AppLogger.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -299,12 +299,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift */,
+				F6A8BCD02A5B4A9400F87E0E /* AppLogger.swift in Sources */,
 				F6A8BC982A5B4A9400F87E0E /* JournalService.swift in Sources */,
 				F6A8BC9E2A5B4A9400F87E0E /* JourneyService.swift in Sources */,
 				F6A8BC912A5B4A9400F87E0E /* TodayView.swift in Sources */,
 				F6A8BC9C2A5B4A9400F87E0E /* LearningService.swift in Sources */,
-				F6A8BC952A5B4A9400F87E0E /* SettingsView.swift in Sources */,
+				F6A8BC952A5B4A9400F87E0E /* ProfileView.swift in Sources */,
 				F6A8BC942A5B4A9400F87E0E /* JourneyView.swift in Sources */,
 				F6A8BC8E2A5B4A9400F87E0E /* AuthGateView.swift in Sources */,
 				F6A8BC8B2A5B4A9400F87E0E /* AppContainer.swift in Sources */,

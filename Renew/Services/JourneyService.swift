@@ -16,7 +16,9 @@ final class JourneyService {
             // Generate a smooth, deterministic curve between 30 and 95.
             let normalized = (sin(Double(offset) / 6.0) + 1) / 2 // 0...1
             let score = 40 + normalized * 55
-            return DailyJourneyScore(date: date, score: score)
+            let components = calendar.dateComponents([.month, .day], from: date)
+            let isTargetDate = components.month == 9 && components.day == 19
+            return DailyJourneyScore(date: date, score: isTargetDate ? 100 : score)
         }
         self.dailyScoresSubject = CurrentValueSubject(scores)
     }

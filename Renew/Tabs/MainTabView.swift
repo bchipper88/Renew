@@ -17,9 +17,9 @@ struct MainTabView: View {
                 .tabItem { Label(MainTab.today.title, systemImage: MainTab.today.icon) }
                 .tag(MainTab.today)
 
-            JourneyView()
-                .tabItem { Label(MainTab.journey.title, systemImage: MainTab.journey.icon) }
-                .tag(MainTab.journey)
+            ToolsView()
+                .tabItem { Label(MainTab.tools.title, systemImage: MainTab.tools.icon) }
+                .tag(MainTab.tools)
 
             ProfileView()
                 .tabItem { Label(MainTab.profile.title, systemImage: MainTab.profile.icon) }
@@ -30,14 +30,14 @@ struct MainTabView: View {
 }
 
 enum MainTab: Hashable {
-    case today, journal, learning, journey, profile
+    case today, journal, learning, tools, profile
 
     var title: String {
         switch self {
         case .today: return "Today"
         case .journal: return "Journal"
-        case .learning: return "Learning"
-        case .journey: return "Journey"
+        case .learning: return "Learn"
+        case .tools: return "Boosts"
         case .profile: return "Profile"
         }
     }
@@ -47,7 +47,7 @@ enum MainTab: Hashable {
         case .today: return "circle.dotted"
         case .journal: return "square.and.pencil"
         case .learning: return "book"
-        case .journey: return "chart.line.uptrend.xyaxis"
+        case .tools: return "wand.and.stars"
         case .profile: return "person.crop.circle"
         }
     }

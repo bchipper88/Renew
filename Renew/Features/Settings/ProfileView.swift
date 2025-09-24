@@ -43,6 +43,8 @@ struct ProfileView: View {
                         }
                     }
 
+                    ProfileJourneyProgressSection()
+
                     ProfileGlassCard(title: "Account") {
                         VStack(alignment: .leading, spacing: 16) {
                             HStack {
@@ -51,21 +53,6 @@ struct ProfileView: View {
                                 Text(accountEmail)
                                     .foregroundStyle(.secondary)
                             }
-
-                            Divider().overlay(Color.white.opacity(0.2))
-
-                            Button(role: .destructive) {
-                                signOut()
-                            } label: {
-                                HStack {
-                                    Spacer()
-                                    Text("Sign Out")
-                                    Spacer()
-                                }
-                                .padding(.vertical, 10)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(.red.opacity(0.85))
                         }
                     }
 
@@ -93,6 +80,17 @@ struct ProfileView: View {
                                 MarkdownStaticPage(title: "Support", markdown: SampleCopy.support)
                             }
                         }
+                    }
+
+                    ProfileGlassCard(title: nil) {
+                        Button(role: .destructive, action: signOut) {
+                            Text("Sign Out")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red.opacity(0.9))
                     }
                 }
                 .padding(.horizontal, 20)
@@ -258,6 +256,39 @@ private struct ProfileLinkRow<Destination: View>: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(.primary)
+    }
+}
+
+private struct ProfileJourneyProgressSection: View {
+    @EnvironmentObject private var container: AppContainer
+    @StateObject private var viewModel = JourneyViewModel()
+    @State private var displayedMonth = Date()
+
+    var body: some View {
+        ProfileGlassCard(title: "Progress Overview") {
+            VStack(alignment: .leading, spacing: 16) {
+                Picker("View Mode", selection: $viewModel.selectedMode) {
+                    ForEach(JourneyViewMode.allCases) { mode in
+                        Text(mode.title)
+                            .tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                switch viewModel.selectedMode {
+                case .calendar:
+                    JourneyCalendarView(
+                        scores: viewModel.dailyScores,
+                        displayedMonth: $displayedMonth
+                    )
+                case .graph:
+                    JourneyGraphView(scores: viewModel.dailyScores)
+                }
+            }
+        }
+        .task {
+            await viewModel.connect(container: container)
+        }
     }
 }
 

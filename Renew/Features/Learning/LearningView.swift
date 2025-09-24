@@ -25,7 +25,7 @@ struct LearningView: View {
                 .padding(.horizontal, 20)
             }
             .background(GradientBackground())
-            .navigationTitle("Learning")
+            .navigationTitle("Learn")
             .navigationDestination(for: LearningArticle.self) { article in
                 LearningDetailView(article: article, isFavorite: viewModel.binding(for: article))
             }
