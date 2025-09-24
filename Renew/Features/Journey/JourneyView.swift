@@ -13,20 +13,20 @@ struct ToolsView: View {
                 HorizontalFilterBar(selectedFilter: $selectedFilter)
                     .padding(.vertical, 16)
                 
-                        // Content cards
-            ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(filteredSessions) { session in
-                                    NavigationLink(destination: destinationView(for: session)) {
-                                        ToolSessionCard(session: session)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
+                // Content cards
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(filteredSessions) { session in
+                            NavigationLink(destination: destinationView(for: session)) {
+                                ToolSessionCard(session: session)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 24)
                 }
-                .padding(.horizontal, 20)
-                            .padding(.bottom, 24)
-            }
-            .scrollIndicators(.hidden)
+                .scrollIndicators(.hidden)
             }
             .background(GradientBackground())
             .navigationTitle("Boosts")
@@ -56,6 +56,12 @@ struct ToolsView: View {
         switch session.title {
         case "Sound":
             SoundPlayerView(session: session)
+        case "Breathe":
+            BreathingExerciseView(session: session)
+        case "Grounding":
+            GroundingExerciseView(session: session)
+        case "Pushups":
+            PushupsExerciseView(session: session)
         default:
             // Placeholder for other sessions
             VStack {
@@ -316,101 +322,8 @@ enum ToolDifficulty: String, CaseIterable {
     }
 }
 
-private struct HorizontalFilterBar: View {
-    @Binding var selectedFilter: ToolFilter
 
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(ToolFilter.allCases) { filter in
-                    FilterButton(
-                        filter: filter,
-                        isSelected: selectedFilter == filter,
-                        onTap: { selectedFilter = filter }
-                    )
-                }
-            }
-            .padding(.horizontal, 20)
-        }
-    }
-}
 
-private struct FilterButton: View {
-    let filter: ToolFilter
-    let isSelected: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            Text(filter.title)
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(isSelected ? filter.textColor : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .fill(isSelected ? filter.backgroundColor : Color.secondary.opacity(0.1))
-            )
-            .overlay(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .stroke(isSelected ? Color.clear : Color.secondary.opacity(0.2), lineWidth: 1)
-                )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct ToolSessionCard: View {
-    let session: ToolSession
-
-    var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            // Hero image background
-            Image(session.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 280)
-                .frame(maxWidth: .infinity)
-                .clipped()
-                        .overlay(
-                            // Gradient overlay for better text readability
-                LinearGradient(
-                                gradient: Gradient(stops: [
-                                    .init(color: .clear, location: 0.4),
-                                    .init(color: session.backgroundColor.opacity(0.3), location: 0.6),
-                                    .init(color: session.backgroundColor.opacity(0.7), location: 0.8),
-                                    .init(color: session.backgroundColor.opacity(0.85), location: 1.0)
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-            
-                    // Text overlay on bottom left
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(session.title)
-                            .font(.title.weight(.bold))
-                            .foregroundStyle(.white)
-
-                        Text(session.subtitle)
-                    .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.9))
-                    }
-                    .padding(.leading, 24)
-                    .padding(.bottom, 24)
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .shadow(color: Color.black.opacity(0.15), radius: 20, x: 0, y: 10)
-    }
-}
 
 
 
@@ -818,408 +731,254 @@ private extension Double {
     }
 }
 
-// MARK: - SoundPlayerView
-struct SoundPlayerView: View {
-    @State private var isPlaying = false
-    @State private var currentTime: TimeInterval = 0
-    @State private var duration: TimeInterval = 300
-    @State private var audioPlayer: AVAudioPlayer?
-    @State private var animationPhase: Double = 0
-    @State private var glowPhase: Double = 0
-    @State private var pulsePhase: Double = 0
-    @State private var playbackTimer: Timer?
-    @Environment(\.dismiss) private var dismiss
-    
-    let session: ToolSession
-    
+// MARK: - Horizontal Filter Bar
+struct HorizontalFilterBar: View {
+    @Binding var selectedFilter: ToolFilter
+
     var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(red: 0.1, green: 0.1, blue: 0.2),
-                    Color(red: 0.05, green: 0.15, blue: 0.2)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            // Fluid glowing background
-            ZStack {
-                // Multiple flowing glow layers
-                ForEach(0..<5, id: \.self) { index in
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    session.backgroundColor.opacity(0.3 + Double(index) * 0.1),
-                                    session.backgroundColor.opacity(0.1 + Double(index) * 0.05),
-                                    Color.clear
-                                ]),
-                                center: .center,
-                                startRadius: 50,
-                                endRadius: 300 + CGFloat(index * 100)
-                            )
-                        )
-                        .frame(width: 600 + CGFloat(index * 200), height: 600 + CGFloat(index * 200))
-                        .scaleEffect(1.0 + sin(glowPhase + Double(index) * 0.5) * 0.3)
-                        .offset(
-                            x: cos(glowPhase + Double(index) * 0.3) * 50,
-                            y: sin(glowPhase + Double(index) * 0.4) * 30
-                        )
-                        .opacity(0.4 - Double(index) * 0.08)
-                        .animation(
-                            .easeInOut(duration: 4.0 + Double(index) * 0.5)
-                            .repeatForever(autoreverses: true),
-                            value: glowPhase
-                        )
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(ToolFilter.allCases) { filter in
+                    FilterButton(
+                        filter: filter,
+                        isSelected: selectedFilter == filter,
+                        onTap: { selectedFilter = filter }
+                    )
                 }
             }
-            
-            // Main glowing orb with flowy design
-            ZStack {
-                // Flowing outer energy rings
-                ForEach(0..<6, id: \.self) { index in
-                    Circle()
-                        .stroke(
-                            AngularGradient(
-                                gradient: Gradient(colors: [
-                                    session.backgroundColor.opacity(0.8 - Double(index) * 0.1),
-                                    session.backgroundColor.opacity(0.4 - Double(index) * 0.05),
-                                    session.backgroundColor.opacity(0.1),
-                                    session.backgroundColor.opacity(0.4 - Double(index) * 0.05),
-                                    session.backgroundColor.opacity(0.8 - Double(index) * 0.1)
-                                ]),
-                                center: .center,
-                                startAngle: .degrees(glowPhase * 360 + Double(index) * 60),
-                                endAngle: .degrees(glowPhase * 360 + Double(index) * 60 + 270)
-                            ),
-                            lineWidth: 4 - CGFloat(index) * 0.6
-                        )
-                        .frame(width: 180 + CGFloat(index * 80))
-                        .scaleEffect(1.0 + sin(pulsePhase + Double(index) * 0.3) * 0.15)
-                        .rotationEffect(.degrees(glowPhase * 180 + Double(index) * 30))
-                        .opacity(0.9 - Double(index) * 0.15)
-                        .animation(
-                            .easeInOut(duration: 3.0 + Double(index) * 0.4)
-                            .repeatForever(autoreverses: false),
-                            value: glowPhase
-                        )
-                }
-                
-                // Flowing inner energy waves
-                ForEach(0..<3, id: \.self) { index in
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    session.backgroundColor.opacity(0.3 + Double(index) * 0.1),
-                                    session.backgroundColor.opacity(0.1 + Double(index) * 0.05),
-                                    Color.clear
-                                ]),
-                                center: .center,
-                                startRadius: 20,
-                                endRadius: 120 + CGFloat(index * 40)
-                            )
-                        )
-                        .frame(width: 240 + CGFloat(index * 60), height: 240 + CGFloat(index * 60))
-                        .scaleEffect(1.0 + sin(animationPhase + Double(index) * 0.5) * 0.2)
-                        .offset(
-                            x: cos(animationPhase + Double(index) * 0.7) * 30,
-                            y: sin(animationPhase + Double(index) * 0.6) * 20
-                        )
-                        .opacity(0.6 - Double(index) * 0.2)
-                        .animation(
-                            .easeInOut(duration: 4.0 + Double(index) * 0.5)
-                            .repeatForever(autoreverses: true)
-                            .delay(Double(index) * 0.3),
-                            value: animationPhase
-                        )
-                }
-                
-                // Main core orb with flowing edges
-                ZStack {
-                    // Outer flowing glow
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    session.backgroundColor.opacity(0.4),
-                                    session.backgroundColor.opacity(0.2),
-                                    Color.clear
-                                ]),
-                                center: .center,
-                                startRadius: 80,
-                                endRadius: 140
-                            )
-                        )
-                        .frame(width: 280, height: 280)
-                        .scaleEffect(1.0 + sin(pulsePhase * 1.5) * 0.1)
-                        .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: pulsePhase)
-                    
-                    // Main orb core
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                gradient: Gradient(colors: [
-                                    session.backgroundColor.opacity(0.95),
-                                    session.backgroundColor.opacity(0.8),
-                                    session.backgroundColor.opacity(0.6),
-                                    session.backgroundColor.opacity(0.3),
-                                    session.backgroundColor.opacity(0.1)
-                                ]),
-                                center: .center,
-                                startRadius: 5,
-                                endRadius: 90
-                            )
-                        )
-                        .frame(width: 180, height: 180)
-                        .overlay(
-                            // Flowing edge highlight
-                            Circle()
-                                .stroke(
-                                    AngularGradient(
-                                        gradient: Gradient(colors: [
-                                            session.backgroundColor.opacity(0.9),
-                                            session.backgroundColor.opacity(0.6),
-                                            session.backgroundColor.opacity(0.3),
-                                            session.backgroundColor.opacity(0.6),
-                                            session.backgroundColor.opacity(0.9)
-                                        ]),
-                                        center: .center,
-                                        startAngle: .degrees(glowPhase * 360),
-                                        endAngle: .degrees(glowPhase * 360 + 180)
-                                    ),
-                                    lineWidth: 6
-                                )
-                        )
-                        .scaleEffect(isPlaying ? 1.15 : 1.0)
-                        .animation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: isPlaying)
-                        .onTapGesture {
-                            togglePlayback()
-                        }
-                }
-            }
-            
-            // Bottom audio controls
-            VStack {
-                Spacer()
-                
-                VStack(spacing: 20) {
-                    // Progress bar
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text(timeString(from: currentTime))
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Spacer()
-                            
-                            Text(timeString(from: duration))
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        GeometryReader { geometry in
-                            ZStack(alignment: .leading) {
-                                // Background
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(Color.white.opacity(0.2))
-                                    .frame(height: 4)
-                                
-                                // Progress
-                                RoundedRectangle(cornerRadius: 2)
+            .padding(.horizontal, 20)
+        }
+    }
+}
+
+// MARK: - Filter Button
+struct FilterButton: View {
+    let filter: ToolFilter
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            Text(filter.title)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(isSelected ? filter.textColor : .primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    ZStack {
+                        // Glassmorphic background
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
                                     .fill(
+                                        isSelected ? 
                                         LinearGradient(
                                             gradient: Gradient(colors: [
-                                                session.backgroundColor,
-                                                session.backgroundColor.opacity(0.7)
+                                                filter.backgroundColor.opacity(0.8),
+                                                filter.backgroundColor.opacity(0.6)
                                             ]),
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .frame(width: geometry.size.width * progress, height: 4)
-                                
-                                // Thumb
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 12, height: 12)
-                                    .offset(x: geometry.size.width * progress - 6)
-                            }
-                        }
-                        .frame(height: 12)
-                    }
-                    
-                    // Playback controls
-                    HStack(spacing: 40) {
-                        Button(action: rewind) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white.opacity(0.1))
-                                    .frame(width: 44, height: 44)
-                                
-                                VStack(spacing: 2) {
-                                    Image(systemName: "gobackward")
-                                        .font(.caption)
-                                    Text("10")
-                                        .font(.caption2)
-                                }
-                                .foregroundColor(.white)
-                            }
-                        }
-                        
-                        Button(action: togglePlayback) {
-                            ZStack {
-                                Circle()
-                                    .fill(
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ) :
                                         LinearGradient(
                                             gradient: Gradient(colors: [
-                                                session.backgroundColor,
-                                                session.backgroundColor.opacity(0.7)
+                                                Color.white.opacity(0.15),
+                                                Color.white.opacity(0.05)
                                             ]),
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
                                         )
                                     )
-                                    .frame(width: 64, height: 64)
-                                
-                                Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
-                            }
-                        }
+                            )
                         
-                        Button(action: fastForward) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white.opacity(0.1))
-                                    .frame(width: 44, height: 44)
-                                
-                                VStack(spacing: 2) {
-                                    Image(systemName: "goforward")
-                                        .font(.caption)
-                                    Text("10")
-                                        .font(.caption2)
-                                }
-                                .foregroundColor(.white)
-                            }
-                        }
+                        // Glassmorphic border
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .strokeBorder(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(isSelected ? 0.5 : 0.2),
+                                        Color.white.opacity(isSelected ? 0.2 : 0.05)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
                     }
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
-            }
+                )
         }
-        .onAppear {
-            setupAudio()
-            startAnimations()
-        }
-        .onDisappear {
-            stopAudio()
-        }
-    }
-    
-    private var progress: Double {
-        guard duration > 0 else { return 0 }
-        return currentTime / duration
-    }
-    
-    private func timeString(from timeInterval: TimeInterval) -> String {
-        let minutes = Int(timeInterval) / 60
-        let seconds = Int(timeInterval) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-    
-    private func setupAudio() {
-        // Try different audio file formats
-        let possibleFiles = [
-            ("sound", "m4r"),
-            ("sound", "m4a"),
-            ("sound", "mp3"),
-            ("sound_meditation", "m4a"),
-            ("sound_meditation", "mp3")
-        ]
-        
-        var audioURL: URL?
-        for (name, ext) in possibleFiles {
-            if let url = Bundle.main.url(forResource: name, withExtension: ext) {
-                audioURL = url
-                print("Found audio file: \(name).\(ext)")
-                break
-            }
-        }
-        
-        guard let url = audioURL else {
-            print("No audio file found. Tried: \(possibleFiles)")
-            return
-        }
-        
-        do {
-            // Configure audio session for playback
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.allowBluetooth, .allowBluetoothA2DP])
-            try AVAudioSession.sharedInstance().setActive(true)
-            
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.numberOfLoops = -1 // Loop indefinitely
-            audioPlayer?.prepareToPlay()
-            duration = audioPlayer?.duration ?? 300
-            print("Audio loaded successfully. Duration: \(duration) seconds")
-        } catch {
-            print("Error loading audio: \(error)")
-        }
-    }
-    
-    private func startAnimations() {
-        withAnimation {
-            animationPhase = 0
-            glowPhase = 0
-            pulsePhase = 0
-        }
-    }
-    
-    private func togglePlayback() {
-        isPlaying.toggle()
-        
-        if isPlaying {
-            audioPlayer?.play()
-            startPlaybackTimer()
-            print("Audio started playing")
-        } else {
-            audioPlayer?.pause()
-            stopPlaybackTimer()
-            print("Audio paused")
-        }
-    }
-    
-    private func rewind() {
-        currentTime = max(0, currentTime - 10)
-        audioPlayer?.currentTime = currentTime
-    }
-    
-    private func fastForward() {
-        currentTime = min(duration, currentTime + 10)
-        audioPlayer?.currentTime = currentTime
-    }
-    
-    private func stopAudio() {
-        isPlaying = false
-        audioPlayer?.stop()
-        audioPlayer?.currentTime = 0
-        currentTime = 0
-        stopPlaybackTimer()
-    }
-    
-    private func startPlaybackTimer() {
-        playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            currentTime = audioPlayer?.currentTime ?? 0
-        }
-    }
-    
-    private func stopPlaybackTimer() {
-        playbackTimer?.invalidate()
-        playbackTimer = nil
+        .buttonStyle(.plain)
     }
 }
 
+// MARK: - Tool Session Card
+struct ToolSessionCard: View {
+    let session: ToolSession
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Hero image background
+            Image(session.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 280)
+                .frame(maxWidth: .infinity)
+                .clipped()
+                .overlay(
+                    // Gradient overlay for better text readability
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            .init(color: .clear, location: 0.4),
+                            .init(color: session.backgroundColor.opacity(0.3), location: 0.6),
+                            .init(color: session.backgroundColor.opacity(0.7), location: 0.8),
+                            .init(color: session.backgroundColor.opacity(0.85), location: 1.0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            
+            // Text overlay on bottom left
+            VStack(alignment: .leading, spacing: 8) {
+                Text(session.title)
+                    .font(.title.weight(.bold))
+                    .foregroundStyle(.white)
+
+                Text(session.subtitle)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+            }
+            .padding(.leading, 24)
+            .padding(.bottom, 24)
+        }
+        .background(
+            ZStack {
+                // Glassmorphic background with blur
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.25),
+                                        Color.white.opacity(0.1)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+                
+                // Glassmorphic border with gradient
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.1),
+                                Color.white.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.1), radius: 30, x: 0, y: 15)
+        .shadow(color: Color.white.opacity(0.1), radius: 1, x: 0, y: 1)
+    }
+}
+
+// MARK: - SoundPlayerView
+struct SoundPlayerView: View {
+    let session: ToolSession
+    
+    var body: some View {
+        VStack {
+            Text("Sound Player")
+                .font(.largeTitle)
+            Text("Coming Soon")
+                .font(.title2)
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - BreathingExerciseView
+struct BreathingExerciseView: View {
+    let session: ToolSession
+    
+    var body: some View {
+        VStack {
+            Text("Breathing Exercise")
+                .font(.largeTitle)
+            Text("Coming Soon")
+                .font(.title2)
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - GroundingExerciseView
+struct GroundingExerciseView: View {
+    let session: ToolSession
+    
+    var body: some View {
+        VStack {
+            Text("Grounding Exercise")
+                .font(.largeTitle)
+            Text("Coming Soon")
+                .font(.title2)
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// MARK: - PushupsExerciseView
+struct PushupsExerciseView: View {
+    let session: ToolSession
+    
+    var body: some View {
+        VStack {
+            Text("Pushups Exercise")
+                .font(.largeTitle)
+            Text("Coming Soon")
+                .font(.title2)
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+
+// MARK: - Coming Soon View
+private struct ComingSoonView: View {
+    let session: ToolSession
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            
+            Image(systemName: "clock")
+                .font(.system(size: 60))
+                .foregroundColor(.secondary)
+            
+            Text("Coming Soon")
+                .font(.title2)
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E4634202E84485A000035E9 /* sound.m4r in Resources */ = {isa = PBXBuildFile; fileRef = 6E46341F2E84485A000035E9 /* sound.m4r */; };
 		F6A8BC8A2A5B4A9400F87E0E /* RenewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC632A5B4A9400F87E0E /* RenewApp.swift */; };
 		F6A8BC8B2A5B4A9400F87E0E /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC612A5B4A9400F87E0E /* AppContainer.swift */; };
 		F6A8BC8C2A5B4A9400F87E0E /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC622A5B4A9400F87E0E /* AppEnvironment.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6E46341F2E84485A000035E9 /* sound.m4r */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound.m4r; sourceTree = "<group>"; };
 		F6A8BC602A5B4A9400F87E0E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		F6A8BC612A5B4A9400F87E0E /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		F6A8BC622A5B4A9400F87E0E /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
@@ -217,6 +219,7 @@
 		F6A8BC552A5B4A9400F87E0E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6E46341F2E84485A000035E9 /* sound.m4r */,
 				F6A8BC762A5B4A9400F87E0E /* Assets.xcassets */,
 			);
 			path = Resources;
@@ -289,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6A8BC9F2A5B4A9400F87E0E /* Assets.xcassets in Resources */,
+				6E4634202E84485A000035E9 /* sound.m4r in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

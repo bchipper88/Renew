@@ -1,0 +1,2534 @@
+import SwiftUI
+import Combine
+import AVFoundation
+
+struct ToolsView: View {
+    @State private var selectedFilter: ToolFilter = .all
+    private let sessions = ToolSession.examples
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Horizontal filter bar
+                HorizontalFilterBar(selectedFilter: $selectedFilter)
+                    .padding(.vertical, 16)
+                
+                        // Content cards
+            ScrollView {
+                            LazyVStack(spacing: 16) {
+                                ForEach(filteredSessions) { session in
+                                    NavigationLink(destination: destinationView(for: session)) {
+                                        ToolSessionCard(session: session)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.horizontal, 20)
+                            .padding(.bottom, 24)
+            }
+            .scrollIndicators(.hidden)
+            }
+            .background(GradientBackground())
+            .navigationTitle("Boosts")
+            .scrollContentBackground(.hidden)
+        }
+    }
+    
+    private var filteredSessions: [ToolSession] {
+        switch selectedFilter {
+        case .all:
+            return sessions
+        case .mind:
+            return sessions.filter { $0.category == .mind }
+        case .body:
+            return sessions.filter { $0.category == .body }
+        case .mood:
+            return sessions.filter { $0.category == .mood }
+        case .vibe:
+            return sessions.filter { $0.category == .vibe }
+        case .social:
+            return sessions.filter { $0.category == .social }
+        }
+    }
+    
+    @ViewBuilder
+    private func destinationView(for session: ToolSession) -> some View {
+        switch session.title {
+        case "Sound":
+            SoundPlayerView(session: session)
+        case "Breathe":
+            BreathingExerciseView(session: session)
+        case "Grounding":
+            GroundingExerciseView(session: session)
+        case "Pushups":
+            PushupsExerciseView(session: session)
+        default:
+            // Placeholder for other sessions
+            VStack {
+                Text(session.title)
+                    .font(.largeTitle)
+                Text("Coming Soon")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+            .navigationTitle(session.title)
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+enum ToolFilter: String, CaseIterable, Identifiable {
+    case all = "All Type"
+    case mind = "Mind"
+    case body = "Body"
+    case mood = "Mood"
+    case vibe = "Vibe"
+    case social = "Social"
+    
+    var id: String { rawValue }
+    
+    var title: String { rawValue }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .all:
+            return Color.primary
+        case .mind:
+            return Color(red: 0.7, green: 0.85, blue: 1.0) // Soft Blue
+        case .body:
+            return Color(red: 0.6, green: 0.9, blue: 0.7) // Fresh Green
+        case .mood:
+            return Color(red: 1.0, green: 0.8, blue: 0.6) // Bright Peach
+        case .vibe:
+            return Color(red: 0.8, green: 0.7, blue: 1.0) // Soft Purple
+        case .social:
+            return Color(red: 1.0, green: 0.95, blue: 0.6) // Soft Yellow
+        }
+    }
+    
+    var textColor: Color {
+        switch self {
+        case .all:
+            return .white
+        default:
+            return .primary
+        }
+    }
+}
+
+enum ToolCategory: String, CaseIterable {
+    case mind
+    case body
+    case mood
+    case vibe
+    case social
+    
+    var title: String {
+        switch self {
+        case .mind: return "Mind"
+        case .body: return "Body"
+        case .mood: return "Mood"
+        case .vibe: return "Vibe"
+        case .social: return "Social"
+        }
+    }
+}
+
+struct ToolSession: Identifiable {
+    let id = UUID()
+    let title: String
+    let subtitle: String
+    let instructor: String
+    let instructorTitle: String
+    let category: ToolCategory
+    let difficulty: ToolDifficulty
+    let imageName: String
+    let backgroundColor: Color
+    
+    static let examples: [ToolSession] = [
+        // Mind Category
+        ToolSession(
+            title: "Breathe",
+            subtitle: "Breathe deep, feel renewed.",
+            instructor: "Anna Juliane",
+            instructorTitle: "Mind Coach",
+            category: .mind,
+            difficulty: .basic,
+            imageName: "breatheWoman",
+            backgroundColor: Color(red: 0.7, green: 0.85, blue: 1.0) // Soft Blue
+        ),
+        ToolSession(
+            title: "Calm",
+            subtitle: "A 3-minute meditation to quiet your mind.",
+            instructor: "Anna Juliane",
+            instructorTitle: "Mind Coach",
+            category: .mind,
+            difficulty: .mid,
+            imageName: "calmMan",
+            backgroundColor: Color(red: 0.7, green: 0.85, blue: 1.0) // Soft Blue
+        ),
+        ToolSession(
+            title: "Focus",
+            subtitle: "Visualize clarity in just 60 seconds.",
+            instructor: "Anna Juliane",
+            instructorTitle: "Mind Coach",
+            category: .mind,
+            difficulty: .basic,
+            imageName: "focusMan",
+            backgroundColor: Color(red: 0.7, green: 0.85, blue: 1.0) // Soft Blue
+        ),
+        
+        // Body Category
+        ToolSession(
+            title: "Pushups",
+            subtitle: "A quick strength burst to recharge energy.",
+            instructor: "Rachel Jules",
+            instructorTitle: "Fitness Guide",
+            category: .body,
+            difficulty: .mid,
+            imageName: "pushupsMan",
+            backgroundColor: Color(red: 0.6, green: 0.9, blue: 0.7) // Fresh Green
+        ),
+        ToolSession(
+            title: "Squats",
+            subtitle: "Boost circulation and wake up your body.",
+            instructor: "Rachel Jules",
+            instructorTitle: "Fitness Guide",
+            category: .body,
+            difficulty: .basic,
+            imageName: "squatsMan",
+            backgroundColor: Color(red: 0.6, green: 0.9, blue: 0.7) // Fresh Green
+        ),
+        ToolSession(
+            title: "Jumping Jacks",
+            subtitle: "Energize your body instantly.",
+            instructor: "Rachel Jules",
+            instructorTitle: "Fitness Guide",
+            category: .body,
+            difficulty: .basic,
+            imageName: "jumpingJacksWoman",
+            backgroundColor: Color(red: 0.6, green: 0.9, blue: 0.7) // Fresh Green
+        ),
+        
+        // Mood Category
+        ToolSession(
+            title: "Gratitude",
+            subtitle: "Write one thing you're thankful for today.",
+            instructor: "Michaela Andy",
+            instructorTitle: "Wellness Expert",
+            category: .mood,
+            difficulty: .basic,
+            imageName: "gratitudeJournal",
+            backgroundColor: Color(red: 1.0, green: 0.8, blue: 0.6) // Bright Peach
+        ),
+        ToolSession(
+            title: "Confidence",
+            subtitle: "Strengthen self-talk with an affirmation.",
+            instructor: "Michaela Andy",
+            instructorTitle: "Wellness Expert",
+            category: .mood,
+            difficulty: .basic,
+            imageName: "confidenceWoman",
+            backgroundColor: Color(red: 1.0, green: 0.8, blue: 0.6) // Bright Peach
+        ),
+        ToolSession(
+            title: "Grounding",
+            subtitle: "Use 5-4-3-2-1 senses to find your center.",
+            instructor: "Michaela Andy",
+            instructorTitle: "Wellness Expert",
+            category: .mood,
+            difficulty: .mid,
+            imageName: "groundingMan",
+            backgroundColor: Color(red: 1.0, green: 0.8, blue: 0.6) // Bright Peach
+        ),
+        
+        // Vibe Category
+        ToolSession(
+            title: "Sound",
+            subtitle: "Relax with calming nature or ambient tones.",
+            instructor: "Sarah Chen",
+            instructorTitle: "Meditation Guide",
+            category: .vibe,
+            difficulty: .basic,
+            imageName: "soundWoman",
+            backgroundColor: Color(red: 0.8, green: 0.7, blue: 1.0) // Soft Purple
+        ),
+        ToolSession(
+            title: "Music",
+            subtitle: "Shift your mood with a single song.",
+            instructor: "Sarah Chen",
+            instructorTitle: "Meditation Guide",
+            category: .vibe,
+            difficulty: .basic,
+            imageName: "musicWoman",
+            backgroundColor: Color(red: 0.8, green: 0.7, blue: 1.0) // Soft Purple
+        ),
+        ToolSession(
+            title: "Create",
+            subtitle: "Express yourself in 60 seconds of doodling or notes.",
+            instructor: "Sarah Chen",
+            instructorTitle: "Meditation Guide",
+            category: .vibe,
+            difficulty: .basic,
+            imageName: "createMan",
+            backgroundColor: Color(red: 0.8, green: 0.7, blue: 1.0) // Soft Purple
+        ),
+        
+        // Social Category
+        ToolSession(
+            title: "Connect",
+            subtitle: "Reach out to a friend or loved one.",
+            instructor: "Emma Wilson",
+            instructorTitle: "Community Builder",
+            category: .social,
+            difficulty: .basic,
+            imageName: "connectWomen",
+            backgroundColor: Color(red: 1.0, green: 0.95, blue: 0.6) // Soft Yellow
+        ),
+        ToolSession(
+            title: "Kindness",
+            subtitle: "Do one small act to brighten someone's day.",
+            instructor: "Emma Wilson",
+            instructorTitle: "Community Builder",
+            category: .social,
+            difficulty: .basic,
+            imageName: "kindnessWoman",
+            backgroundColor: Color(red: 1.0, green: 0.95, blue: 0.6) // Soft Yellow
+        ),
+        ToolSession(
+            title: "Purpose",
+            subtitle: "Reflect on your why for today.",
+            instructor: "Emma Wilson",
+            instructorTitle: "Community Builder",
+            category: .social,
+            difficulty: .mid,
+            imageName: "purposeWoman",
+            backgroundColor: Color(red: 1.0, green: 0.95, blue: 0.6) // Soft Yellow
+        )
+    ]
+}
+
+enum ToolDifficulty: String, CaseIterable {
+    case basic = "Basic"
+    case mid = "Mid"
+    case advanced = "Advance"
+    
+    var color: Color {
+        switch self {
+        case .basic: return .green
+        case .mid: return .yellow
+        case .advanced: return .pink
+        }
+    }
+}
+
+private struct HorizontalFilterBar: View {
+    @Binding var selectedFilter: ToolFilter
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(ToolFilter.allCases) { filter in
+                    FilterButton(
+                        filter: filter,
+                        isSelected: selectedFilter == filter,
+                        onTap: { selectedFilter = filter }
+                    )
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+    }
+}
+
+private struct FilterButton: View {
+    let filter: ToolFilter
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            Text(filter.title)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(isSelected ? filter.textColor : .primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    ZStack {
+                        // Glassmorphic background
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .fill(
+                                        isSelected ? 
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                filter.backgroundColor.opacity(0.8),
+                                                filter.backgroundColor.opacity(0.6)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ) :
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color.white.opacity(0.15),
+                                                Color.white.opacity(0.05)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                            )
+                        
+                        // Glassmorphic border
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .strokeBorder(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(isSelected ? 0.5 : 0.2),
+                                        Color.white.opacity(isSelected ? 0.2 : 0.05)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    }
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ToolSessionCard: View {
+    let session: ToolSession
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Hero image background
+            Image(session.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(height: 280)
+                .frame(maxWidth: .infinity)
+                .clipped()
+                        .overlay(
+                            // Gradient overlay for better text readability
+                LinearGradient(
+                                gradient: Gradient(stops: [
+                                    .init(color: .clear, location: 0.4),
+                                    .init(color: session.backgroundColor.opacity(0.3), location: 0.6),
+                                    .init(color: session.backgroundColor.opacity(0.7), location: 0.8),
+                                    .init(color: session.backgroundColor.opacity(0.85), location: 1.0)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+            
+                    // Text overlay on bottom left
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(session.title)
+                            .font(.title.weight(.bold))
+                            .foregroundStyle(.white)
+
+                        Text(session.subtitle)
+                    .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.9))
+                    }
+                    .padding(.leading, 24)
+                    .padding(.bottom, 24)
+        }
+        .background(
+            ZStack {
+                // Glassmorphic background with blur
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.25),
+                                        Color.white.opacity(0.1)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    )
+                
+                // Glassmorphic border with gradient
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0.4),
+                                Color.white.opacity(0.1),
+                                Color.white.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.1), radius: 30, x: 0, y: 15)
+        .shadow(color: Color.white.opacity(0.1), radius: 1, x: 0, y: 1)
+    }
+}
+
+
+
+@MainActor
+final class JourneyViewModel: ObservableObject {
+    @Published var dailyScores: [DailyJourneyScore] = []
+    @Published var selectedMode: JourneyViewMode = .calendar
+    private var cancellables: Set<AnyCancellable> = []
+
+    func connect(container: AppContainer) async {
+        guard cancellables.isEmpty else { return }
+        container.journeyService.dailyScoresPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] scores in
+                self?.dailyScores = scores.sorted { $0.date < $1.date }
+            }
+            .store(in: &cancellables)
+    }
+}
+
+enum JourneyViewMode: String, CaseIterable, Identifiable {
+    case calendar
+    case graph
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .calendar: return "Calendar"
+        case .graph: return "Graph"
+        }
+    }
+}
+
+struct GlassCard<Content: View>: View {
+    private let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(Color.white.opacity(0.18), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
+    }
+}
+
+struct JourneyCalendarView: View {
+    let scores: [DailyJourneyScore]
+    @Binding var displayedMonth: Date
+
+    private let calendar = Calendar.current
+
+    private var monthMetadata: MonthMetadata {
+        MonthMetadata(calendar: calendar, month: displayedMonth)
+    }
+
+    private var scoresByDay: [Date: DailyJourneyScore] {
+        Dictionary(uniqueKeysWithValues: scores.map { ($0.date.startOfDay, $0) })
+    }
+
+    private var weekdaySymbols: [String] {
+        let symbols = calendar.shortWeekdaySymbols
+        let firstWeekdayIndex = calendar.firstWeekday - 1
+        return Array(symbols[firstWeekdayIndex...] + symbols[..<firstWeekdayIndex])
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            header
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 12) {
+                ForEach(weekdaySymbols, id: \.self) { symbol in
+                    Text(symbol)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+
+                ForEach(Array(monthMetadata.days.enumerated()), id: \.offset) { _, day in
+                    CalendarDayCell(day: day, score: day.flatMap { scoresByDay[$0.startOfDay]?.score })
+                }
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: displayedMonth)
+    }
+
+    private var header: some View {
+        HStack {
+            Button(action: { displayedMonth = updateMonth(by: -1) }) {
+                Image(systemName: "chevron.left")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                    .background(Circle().fill(Color.white.opacity(0.08)))
+            }
+
+            Spacer()
+
+            VStack(spacing: 4) {
+                Text(displayedMonth.formatted(.dateTime.month(.wide).year()))
+                    .font(.title3.weight(.semibold))
+                Text("Tap a day to review")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button(action: { displayedMonth = updateMonth(by: 1) }) {
+                Image(systemName: "chevron.right")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                    .background(Circle().fill(Color.white.opacity(0.08)))
+            }
+        }
+    }
+
+    private func updateMonth(by offset: Int) -> Date {
+        guard let shifted = calendar.date(byAdding: .month, value: offset, to: displayedMonth) else { return displayedMonth }
+        let components = calendar.dateComponents([.year, .month], from: shifted)
+        return calendar.date(from: components) ?? shifted
+    }
+}
+
+private struct CalendarDayCell: View {
+    let day: Date?
+    let score: Double?
+
+    private let softRed = Color(red: 0.98, green: 0.56, blue: 0.60)
+    private let softYellow = Color(red: 0.99, green: 0.88, blue: 0.64)
+    private let softGreen = Color(red: 0.64, green: 0.88, blue: 0.72)
+
+    var body: some View {
+        VStack(spacing: 6) {
+            if let day {
+                Text(day.formatted(.dateTime.day()))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.primary)
+
+                Circle()
+                    .fill(color(for: score))
+                    .frame(width: 12, height: 12)
+                    .opacity(score == nil ? 0.2 : 1)
+            } else {
+                Text("")
+                    .frame(height: 24)
+                Circle()
+                    .fill(Color.clear)
+                    .frame(width: 12, height: 12)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(day == nil ? 0 : 0.05))
+        )
+    }
+
+    private func color(for score: Double?) -> Color {
+        guard let score else { return Color.white.opacity(0.25) }
+        if score < 50 { return softRed }
+        if score <= 75 { return softYellow }
+        return softGreen
+    }
+}
+
+struct JourneyGraphView: View {
+    let scores: [DailyJourneyScore]
+
+    private let gradient = LinearGradient(
+        gradient: Gradient(colors: [
+            Color(red: 0.54, green: 0.82, blue: 0.99),
+            Color(red: 0.99, green: 0.88, blue: 0.64),
+            Color(red: 0.98, green: 0.56, blue: 0.60)
+        ]),
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    private let fillGradient = LinearGradient(
+        gradient: Gradient(colors: [
+            Color(red: 0.62, green: 0.85, blue: 1.0).opacity(0.35),
+            Color(red: 1.0, green: 0.93, blue: 0.75).opacity(0.4),
+            Color(red: 1.0, green: 0.72, blue: 0.73).opacity(0.45)
+        ]),
+        startPoint: .top,
+        endPoint: .bottom
+    )
+
+    private var sortedScores: [DailyJourneyScore] {
+        scores.sorted { $0.date < $1.date }
+    }
+
+    private var displayedScores: [DailyJourneyScore] {
+        let tail = sortedScores.suffix(7)
+        return Array(tail)
+    }
+
+    private var axisDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }
+
+    private var weekdayFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter
+    }
+
+    private var axisDates: [Date] {
+        displayedScores.map(\.date)
+    }
+
+    private let yAxisValues: [Int] = [100, 75, 50, 25, 0]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Daily Score")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            GeometryReader { geometry in
+                ZStack {
+                    GridBackground()
+
+                    if let pathData = GraphPathGenerator(points: displayedScores).path(in: geometry.size) {
+                        pathData.fill
+                            .fill(fillGradient)
+
+                        pathData.line
+                            .stroke(gradient, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+
+                        ForEach(Array(pathData.markers.enumerated()), id: \.offset) { _, marker in
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 10, height: 10)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                                )
+                                .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                                .position(marker)
+                        }
+                    } else {
+                        Text("Not enough data")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                }
+                .overlay(alignment: .trailing) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        ForEach(yAxisValues, id: \.self) { value in
+                            Text("\(value)")
+                                .font(.caption2.weight(value == 0 || value == 100 ? .semibold : .regular))
+                                .foregroundStyle(.secondary)
+                            if value != yAxisValues.last {
+                                Spacer()
+                            }
+                        }
+                    }
+                    .frame(height: geometry.size.height, alignment: .top)
+                    .padding(.trailing, 4)
+                }
+            }
+            .frame(height: 220)
+
+            if !axisDates.isEmpty {
+                HStack(alignment: .top) {
+                    ForEach(Array(axisDates.enumerated()), id: \.offset) { _, date in
+                        VStack(spacing: 2) {
+                            Text(axisDateFormatter.string(from: date))
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Text(weekdayFormatter.string(from: date).lowercased())
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct GridBackground: View {
+    var body: some View {
+        GeometryReader { geometry in
+            let height = geometry.size.height
+            let width = geometry.size.width
+
+            Path { path in
+                for index in 0..<5 {
+                    let y = height * CGFloat(index) / 4
+                    path.move(to: CGPoint(x: 0, y: y))
+                    path.addLine(to: CGPoint(x: width, y: y))
+                }
+            }
+            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+        }
+    }
+}
+
+private struct GraphPath {
+    let line: Path
+    let fill: Path
+    let markers: [CGPoint]
+}
+
+private struct GraphPathGenerator {
+    let points: [DailyJourneyScore]
+
+    func path(in size: CGSize) -> GraphPath? {
+        guard points.count > 1 else { return nil }
+
+        let sortedPoints = points.sorted { $0.date < $1.date }
+        let minScore: Double = 0
+        let maxScore: Double = 100
+        let range = maxScore - minScore
+
+        let width = size.width
+        let height = size.height
+        let stepX = width / CGFloat(sortedPoints.count - 1)
+
+        var linePath = Path()
+        var fillPath = Path()
+        var markerPoints: [CGPoint] = []
+
+        for (index, point) in sortedPoints.enumerated() {
+            let x = stepX * CGFloat(index)
+            let clampedScore = min(max(point.score, minScore), maxScore)
+            let normalized = (clampedScore - minScore) / range
+            let y = height * (1 - CGFloat(normalized))
+            let cgPoint = CGPoint(x: x, y: y)
+
+            if index == 0 {
+                linePath.move(to: cgPoint)
+                fillPath.move(to: CGPoint(x: 0, y: height))
+                fillPath.addLine(to: cgPoint)
+            } else {
+                linePath.addLine(to: cgPoint)
+                fillPath.addLine(to: cgPoint)
+            }
+
+            markerPoints.append(cgPoint)
+        }
+
+        fillPath.addLine(to: CGPoint(x: width, y: height))
+        fillPath.closeSubpath()
+
+        return GraphPath(line: linePath, fill: fillPath, markers: markerPoints)
+    }
+}
+
+private struct MonthMetadata {
+    let calendar: Calendar
+    let month: Date
+
+    var days: [Date?] {
+        guard let monthInterval = calendar.dateInterval(of: .month, for: month) else { return [] }
+        let firstDay = monthInterval.start
+        let daysRange = calendar.range(of: .day, in: .month, for: firstDay) ?? 1..<32
+
+        let firstWeekday = calendar.component(.weekday, from: firstDay)
+        let leadingPadding = (firstWeekday - calendar.firstWeekday + 7) % 7
+
+        var days: [Date?] = Array(repeating: nil, count: leadingPadding)
+
+        for day in daysRange {
+            if let date = calendar.date(byAdding: DateComponents(day: day - 1), to: firstDay) {
+                days.append(date)
+            }
+        }
+
+        while days.count % 7 != 0 {
+            days.append(nil)
+        }
+
+        return days
+    }
+}
+
+private extension Date {
+    var startOfDay: Date { Calendar.current.startOfDay(for: self) }
+}
+
+private extension Double {
+    var asPercent: String {
+        (self * 100).formatted(.number.precision(.fractionLength(0...1))) + "%"
+    }
+}
+
+// MARK: - SoundPlayerView
+struct SoundPlayerView: View {
+    @State private var isPlaying = false
+    @State private var currentTime: TimeInterval = 0
+    @State private var duration: TimeInterval = 0
+    @State private var audioPlayer: AVAudioPlayer?
+    @State private var playbackTimer: Timer?
+    @State private var isClaimingBoost = false
+    @State private var showElectricGlow = false
+    @State private var hasClaimedBoost = false
+
+    let session: ToolSession
+    
+    private var progress: Double {
+        guard duration > 0 else { return 0 }
+        return currentTime / duration
+    }
+    
+    private var isAudioComplete: Bool {
+        guard duration > 0 else { return false }
+        return currentTime >= duration - 1.0 // Allow 1 second tolerance
+    }
+
+    var body: some View {
+        ZStack {
+            FluidSoundBackground(isPlaying: isPlaying)
+                .ignoresSafeArea()
+
+            VStack(spacing: 32) {
+                Spacer()
+
+                VStack(spacing: 16) {
+                    FluidOrbView(isPlaying: isPlaying)
+                        .frame(width: 280, height: 280)
+                        .scaleEffect(isPlaying ? 1.06 : 1.0)
+                        .shadow(color: SoundPalette.accent.opacity(0.35), radius: 40, x: 0, y: 24)
+                        .animation(.easeInOut(duration: 1.2), value: isPlaying)
+                        .onTapGesture {
+                            togglePlayback()
+                        }
+
+                    Text(isPlaying ? "Tap the orb to pause" : "Tap the orb to play")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+
+                Spacer()
+
+                playbackControls
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 60)
+            .padding(.top, 32)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+        .onAppear(perform: setupAudio)
+        .onDisappear(perform: stopAudio)
+    }
+
+    private var playbackControls: some View {
+            VStack(spacing: 20) {
+                VStack(spacing: 8) {
+                    // Progress bar (non-interactive)
+                    GeometryReader { geometry in
+                        let barWidth = geometry.size.width * 0.67 // 2/3 of screen width
+                        ZStack(alignment: .leading) {
+                            // Background track
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: barWidth, height: 8)
+                            
+                            // Progress fill
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: SoundPalette.gradient),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: barWidth * progress, height: 8)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .frame(height: 4)
+                    .opacity(duration > 0 ? 1 : 0.4)
+
+                    GeometryReader { geometry in
+                        let barWidth = geometry.size.width * 0.67 // Same as progress bar
+                        HStack {
+                            Text(timeString(from: currentTime))
+                                .font(.caption.monospacedDigit())
+                                .foregroundColor(.white.opacity(0.7))
+
+                            Spacer()
+
+                            Text(timeString(from: duration))
+                                .font(.caption.monospacedDigit())
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .frame(width: barWidth)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .frame(height: 20)
+                }
+
+                VStack(spacing: 16) {
+                    // Play/pause button
+                    Button(action: togglePlayback) {
+                        ZStack {
+                            Circle()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: SoundPalette.gradient),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 72, height: 72)
+                                .shadow(color: SoundPalette.accent.opacity(0.45), radius: 24, x: 0, y: 12)
+
+                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                .font(.title)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    
+                        // Claim Boost button
+                        ZStack {
+                            // Electric glow effect
+                            if showElectricGlow {
+                                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                    .fill(
+                                        RadialGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(red: 1.0, green: 0.95, blue: 0.6),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.4),
+                                                Color.clear
+                                            ]),
+                                            center: .center,
+                                            startRadius: 0,
+                                            endRadius: 100
+                                        )
+                                    )
+                                    .frame(width: 200, height: 60)
+                                    .blur(radius: 20)
+                                    .scaleEffect(showElectricGlow ? 1.5 : 0.5)
+                                    .opacity(showElectricGlow ? 1.0 : 0.0)
+                                    .animation(.easeInOut(duration: 0.6), value: showElectricGlow)
+                            }
+                            
+                            Button(action: claimBoost) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: (isClaimingBoost || hasClaimedBoost) ? "bolt.fill" : "plus.circle.fill")
+                                        .font(.caption)
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                        .rotationEffect(.degrees(isClaimingBoost ? 360 : 0))
+                                        .animation(.easeInOut(duration: 0.5), value: isClaimingBoost)
+                                    
+                                    Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Claim Boost +3")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                        .fill(
+                                            isAudioComplete ?
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.8),
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.6) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.6)
+                                                ]),
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            ) :
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [Color.gray.opacity(0.3)]),
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                        .strokeBorder(
+                                            isAudioComplete ?
+                                            Color.white.opacity(0.2) :
+                                            Color.gray.opacity(0.2),
+                                            lineWidth: 1
+                                        )
+                                )
+                                .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
+                            }
+                            .disabled(!isAudioComplete || isClaimingBoost)
+                            .opacity(isAudioComplete ? 1.0 : 0.6)
+                            .buttonStyle(PlainButtonStyle())
+                            .contentShape(Rectangle())
+                            .simultaneousGesture(
+                                TapGesture()
+                                    .onEnded { _ in
+                                        if isAudioComplete && !isClaimingBoost {
+                                            claimBoost()
+                                        }
+                                    }
+                            )
+                        }
+                }
+            }
+        .padding(24)
+    }
+
+
+
+    private func timeString(from timeInterval: TimeInterval) -> String {
+        guard timeInterval.isFinite, !timeInterval.isNaN else { return "00:00" }
+        let minutes = Int(timeInterval) / 60
+        let seconds = Int(timeInterval) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    private func setupAudio() {
+        guard audioPlayer == nil else { return }
+
+        // Try different possible file locations and formats
+        let possibleFiles = [
+            ("sound", "m4r"),
+            ("sound", "m4a"), 
+            ("sound", "mp3"),
+            ("sound_meditation", "m4a"),
+            ("sound_meditation", "mp3")
+        ]
+
+        var audioURL: URL?
+        var foundFile: (String, String)?
+        
+        for (name, ext) in possibleFiles {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) {
+                audioURL = url
+                foundFile = (name, ext)
+                print("✅ Found audio file: \(name).\(ext)")
+                break
+            } else {
+                print("❌ Not found: \(name).\(ext)")
+            }
+        }
+
+        // If no file found in bundle, try direct path (for development)
+        if audioURL == nil {
+            let directPath = "/Users/johnhonochick/My Apps/Renew/Renew/Resources/Audio/sound.m4r"
+            if FileManager.default.fileExists(atPath: directPath) {
+                audioURL = URL(fileURLWithPath: directPath)
+                foundFile = ("sound", "m4r")
+                print("✅ Found audio file via direct path: \(directPath)")
+            }
+        }
+
+        guard let url = audioURL, let file = foundFile else {
+            print("❌ No audio file found anywhere. Tried: \(possibleFiles)")
+            print("📁 Bundle path: \(Bundle.main.bundlePath)")
+            print("📁 Bundle resources: \(Bundle.main.resourcePath ?? "nil")")
+            return
+        }
+
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.allowBluetoothHFP, .allowBluetoothA2DP])
+            try AVAudioSession.sharedInstance().setActive(true)
+
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.numberOfLoops = 0 // Don't loop - play once and stop
+            player.prepareToPlay()
+
+            audioPlayer = player
+            duration = player.duration
+            currentTime = 0
+            
+            print("🎵 Audio loaded successfully: \(file.0).\(file.1)")
+            print("⏱️ Duration: \(duration) seconds")
+        } catch {
+            print("❌ Error loading audio: \(error)")
+        }
+    }
+
+    private func togglePlayback() {
+        if audioPlayer == nil {
+            setupAudio()
+        }
+        guard let player = audioPlayer else { return }
+
+        isPlaying.toggle()
+
+        if isPlaying {
+            player.currentTime = currentTime
+            player.play()
+            startPlaybackTimer()
+        } else {
+            player.pause()
+            stopPlaybackTimer()
+        }
+    }
+
+
+    private func stopAudio() {
+        isPlaying = false
+        playbackTimer?.invalidate()
+        playbackTimer = nil
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0
+        currentTime = 0
+    }
+
+    private func startPlaybackTimer() {
+        stopPlaybackTimer()
+        playbackTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            currentTime = audioPlayer?.currentTime ?? 0
+            
+            // Check if audio has finished
+            if let player = audioPlayer, !player.isPlaying && isPlaying {
+                // Audio finished playing
+                isPlaying = false
+                stopPlaybackTimer()
+            }
+        }
+    }
+
+    private func stopPlaybackTimer() {
+        playbackTimer?.invalidate()
+        playbackTimer = nil
+    }
+    
+    private func claimBoost() {
+        // Start animation
+        isClaimingBoost = true
+        showElectricGlow = true
+        
+        // Multiple haptic feedback for more vibration
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        // Additional vibration sequence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            impactFeedback.impactOccurred()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            impactFeedback.impactOccurred()
+        }
+        
+        // Stop glow after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            showElectricGlow = false
+        }
+        
+            // Set permanent claimed state with additional vibration
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                isClaimingBoost = false
+                hasClaimedBoost = true
+                
+                // Additional vibration for transition to permanent state
+                let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                impactFeedback.impactOccurred()
+            }
+        
+        // TODO: Implement boost claiming logic
+        print("🎯 Boost claimed! +3 points")
+        // This could trigger:
+        // - Add points to user profile
+        // - Show success animation
+        // - Update UI to show claimed state
+        // - Navigate back or show next boost
+    }
+}
+
+private enum SoundPalette {
+    static let aqua = Color(red: 0.36, green: 0.89, blue: 1.0)
+    static let green = Color(red: 0.78, green: 0.98, blue: 0.67)
+    static let yellow = Color(red: 1.0, green: 0.94, blue: 0.52)
+    static let gradient: [Color] = [aqua, green, yellow]
+    static let accent = aqua
+}
+
+private struct FluidSoundBackground: View {
+    let isPlaying: Bool
+
+    var body: some View {
+        TimelineView(.animation) { timeline in
+            let time = timeline.date.timeIntervalSinceReferenceDate
+            let activity = isPlaying ? 1.0 : 0.35
+            let baseSpeed = isPlaying ? 0.32 : 0.12
+
+            let offset1 = CGSize(
+                width: cos(time * baseSpeed) * 120 * activity,
+                height: sin(time * baseSpeed * 1.2) * 90 * activity
+            )
+
+            let offset2 = CGSize(
+                width: cos(time * baseSpeed * 0.8 + .pi / 3) * 140 * activity,
+                height: sin(time * baseSpeed * 0.9 + .pi / 4) * 110 * activity
+            )
+
+            let offset3 = CGSize(
+                width: cos(time * baseSpeed * 1.3 + .pi / 2) * 100 * activity,
+                height: sin(time * baseSpeed * 1.1 + .pi / 6) * 120 * activity
+            )
+
+            ZStack {
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        SoundPalette.aqua.opacity(0.55),
+                        Color(red: 0.04, green: 0.07, blue: 0.18),
+                        SoundPalette.yellow.opacity(0.45)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                RadialGradient(
+                    gradient: Gradient(colors: [SoundPalette.aqua.opacity(0.3), Color.clear]),
+                    center: .topLeading,
+                    startRadius: 60,
+                    endRadius: 360
+                )
+
+                RadialGradient(
+                    gradient: Gradient(colors: [SoundPalette.yellow.opacity(0.25), Color.clear]),
+                    center: .bottomTrailing,
+                    startRadius: 60,
+                    endRadius: 340
+                )
+
+                ZStack {
+                    Circle()
+                        .fill(SoundPalette.aqua.opacity(0.45))
+                        .frame(width: 560, height: 560)
+                        .blur(radius: 160)
+                        .offset(offset1)
+                        .blendMode(.screen)
+
+                    Circle()
+                        .fill(SoundPalette.green.opacity(0.5))
+                        .frame(width: 520, height: 520)
+                        .blur(radius: 150)
+                        .offset(offset2)
+                        .blendMode(.screen)
+
+                    Circle()
+                        .fill(SoundPalette.yellow.opacity(0.45))
+                        .frame(width: 540, height: 540)
+                        .blur(radius: 140)
+                        .offset(offset3)
+                        .blendMode(.screen)
+                }
+                .compositingGroup()
+
+                Circle()
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    .scaleEffect(1.3)
+                    .blur(radius: 12)
+            }
+        }
+    }
+}
+
+private struct FluidOrbView: View {
+    let isPlaying: Bool
+
+    var body: some View {
+        TimelineView(.animation) { timeline in
+            let time = timeline.date.timeIntervalSinceReferenceDate
+            let activity = isPlaying ? 1.0 : 0.2
+            let speed = isPlaying ? 1.15 : 0.35
+            let swirl = time * speed
+            
+            // Slow breathing pulse (very slow)
+            let breathPulse = sin(time * 0.3) * 0.15 + 1.0
+            let slowPulse = sin(time * 0.2) * 0.1 + 1.0
+            let deepPulse = sin(time * 0.15) * 0.08 + 1.0
+
+            let wave1 = sin(swirl * 1.1) * activity
+            let wave2 = sin(swirl * 0.9 + .pi / 2) * activity
+            let wave3 = sin(swirl * 1.4 + .pi / 3) * activity
+
+            ZStack {
+                // Outer breathing glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [
+                                SoundPalette.aqua.opacity(0.25),
+                                Color.clear
+                            ]),
+                            center: .center,
+                            startRadius: 80,
+                            endRadius: 280
+                        )
+                    )
+                    .blur(radius: 60)
+                    .scaleEffect(breathPulse * 1.2)
+                    .opacity(0.6)
+                    .blendMode(.screen)
+
+                // Main outer glow with slow pulse
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            gradient: Gradient(colors: [
+                                SoundPalette.aqua.opacity(0.35),
+                                Color.clear
+                            ]),
+                            center: .center,
+                            startRadius: 60,
+                            endRadius: 200
+                        )
+                    )
+                    .blur(radius: 45)
+                    .scaleEffect((1.1 + CGFloat(wave1) * 0.08) * slowPulse)
+                    .opacity(0.9)
+                    .blendMode(.screen)
+
+                // Flowing energy circles with breathing
+                ForEach(0..<3, id: \.self) { index in
+                    let color = SoundPalette.gradient[index]
+                    let pulseMultiplier = 1.0 + sin(time * (0.25 + Double(index) * 0.1)) * 0.12
+                    Circle()
+                        .fill(color.opacity(0.55))
+                        .frame(width: 220, height: 220)
+                        .blur(radius: 70)
+                        .scaleEffect(pulseMultiplier)
+                        .offset(
+                            x: CGFloat(cos(swirl * (1.2 + Double(index) * 0.35) + Double(index)) * 48 * activity),
+                            y: CGFloat(sin(swirl * (0.9 + Double(index) * 0.4) + Double(index) * 1.2) * 48 * activity)
+                        )
+                        .blendMode(.screen)
+                }
+
+                // Main orb with deep breathing
+                Circle()
+                    .fill(
+                        AngularGradient(
+                            gradient: Gradient(colors: SoundPalette.gradient + [SoundPalette.gradient.first!]),
+                            center: .center,
+                            startAngle: .degrees(swirl * 40),
+                            endAngle: .degrees(swirl * 40 + 360)
+                        )
+                    )
+                    .scaleEffect(deepPulse)
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.22), lineWidth: 2)
+                            .blur(radius: 1)
+                            .opacity(0.8)
+                    )
+                    .overlay(
+                        Circle()
+                            .strokeBorder(Color.white.opacity(0.25), lineWidth: 1.5)
+                            .scaleEffect((1.08 + CGFloat(wave2) * 0.04) * slowPulse)
+                            .opacity(0.4)
+                    )
+
+                // Inner glow with breathing
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0.6),
+                                Color.white.opacity(0.05)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 120, height: 120)
+                    .blur(radius: 18)
+                    .scaleEffect(breathPulse)
+                    .offset(x: CGFloat(wave2 * 18), y: CGFloat(wave3 * 18))
+                    .opacity(0.9)
+
+                // Rotating highlight with slow pulse
+                Circle()
+                    .strokeBorder(
+                        AngularGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0.0),
+                                Color.white.opacity(0.6),
+                                Color.white.opacity(0.0)
+                            ]),
+                            center: .center,
+                            startAngle: .degrees(swirl * 60),
+                            endAngle: .degrees(swirl * 60 + 180)
+                        ),
+                        lineWidth: 6
+                    )
+                    .scaleEffect((1.16 + CGFloat(wave1) * 0.05) * slowPulse)
+                    .opacity(0.5)
+
+                // Energy rays with breathing
+                ForEach(0..<4, id: \.self) { index in
+                    let rayPulse = 1.0 + sin(time * (0.2 + Double(index) * 0.05)) * 0.15
+                    Capsule()
+                        .fill(Color.white.opacity(0.12))
+                        .frame(width: 8, height: 140)
+                        .blur(radius: 6)
+                        .scaleEffect(rayPulse)
+                        .rotationEffect(.degrees(Double(index) * 45 + wave3 * 12))
+                        .opacity(0.5 - Double(index) * 0.08)
+                }
+                
+                // Additional slow pulsing rings
+                ForEach(0..<2, id: \.self) { index in
+                    let ringPulse = 1.0 + sin(time * (0.18 + Double(index) * 0.08)) * 0.2
+                    Circle()
+                        .strokeBorder(
+                            Color.white.opacity(0.08 - Double(index) * 0.03),
+                            lineWidth: 2 - CGFloat(index)
+                        )
+                        .frame(width: 200 + CGFloat(index * 40), height: 200 + CGFloat(index * 40))
+                        .scaleEffect(ringPulse)
+                        .opacity(0.6 - Double(index) * 0.2)
+                }
+            }
+            .compositingGroup()
+            .shadow(color: SoundPalette.aqua.opacity(0.15), radius: 18, x: 0, y: 10)
+        }
+    }
+}
+
+// MARK: - Breathing Exercise View
+private struct BreathingExerciseView: View {
+    let session: ToolSession
+    
+    @State private var selectedDifficulty: BreathingDifficulty = .beginner
+    @State private var isExercising = false
+    @State private var currentPhase: BreathingPhase = .inhale
+    @State private var timeRemaining = 0
+    @State private var totalCycles = 0
+    @State private var completedCycles = 0
+    @State private var timer: Timer?
+    @State private var canClaimBoost = false
+    @State private var currentCycleProgress: Double = 0.0
+    @State private var isClaimingBoost = false
+    @State private var showElectricGlow = false
+    @State private var hasClaimedBoost = false
+    
+    enum BreathingDifficulty: CaseIterable {
+        case beginner, advanced
+        
+        var title: String {
+            switch self {
+            case .beginner: return "2-8-4 - Claim Boost +1"
+            case .advanced: return "4-16-8 - Claim Boost +3"
+            }
+        }
+        
+        var inhaleTime: Int {
+            switch self {
+            case .beginner: return 2
+            case .advanced: return 4
+            }
+        }
+        
+        var holdTime: Int {
+            switch self {
+            case .beginner: return 8
+            case .advanced: return 16
+            }
+        }
+        
+        var exhaleTime: Int {
+            switch self {
+            case .beginner: return 4
+            case .advanced: return 8
+            }
+        }
+        
+        var boostPoints: Int {
+            switch self {
+            case .beginner: return 1
+            case .advanced: return 3
+            }
+        }
+    }
+    
+    enum BreathingPhase {
+        case inhale, hold, exhale, rest
+        
+        var instruction: String {
+            switch self {
+            case .inhale: return "Breathe In"
+            case .hold: return "Hold"
+            case .exhale: return "Breathe Out"
+            case .rest: return "Rest"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .inhale: return .blue
+            case .hold: return .green
+            case .exhale: return .orange
+            case .rest: return .purple
+            }
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            // Use the same GradientBackground as the main Boosts page
+            GradientBackground()
+            
+            VStack(spacing: 32) {
+                if !isExercising {
+                    // Difficulty selection
+                    VStack(spacing: 24) {
+                        Text("Choose Your Breathing Exercise")
+                            .font(.title2.weight(.semibold))
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+                        
+                        VStack(spacing: 16) {
+                            ForEach(BreathingDifficulty.allCases, id: \.self) { difficulty in
+                                Button(action: {
+                                    selectedDifficulty = difficulty
+                                    startExercise()
+                                }) {
+                                    VStack(spacing: 8) {
+                                        Text(difficulty.title)
+                                            .font(.headline.weight(.medium))
+                                            .foregroundColor(.white)
+                                        
+                                        HStack(spacing: 4) {
+                                            Text("Inhale")
+                                                .font(.caption)
+                                            Text("\(difficulty.inhaleTime)s")
+                                                .font(.caption.weight(.semibold))
+                                            
+                                            Text("•")
+                                                .font(.caption)
+                                            
+                                            Text("Hold")
+                                                .font(.caption)
+                                            Text("\(difficulty.holdTime)s")
+                                                .font(.caption.weight(.semibold))
+                                            
+                                            Text("•")
+                                                .font(.caption)
+                                            
+                                            Text("Exhale")
+                                                .font(.caption)
+                                            Text("\(difficulty.exhaleTime)s")
+                                                .font(.caption.weight(.semibold))
+                                        }
+                                        .foregroundColor(.white.opacity(0.8))
+                                    }
+                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 24)
+                                    .frame(maxWidth: .infinity)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .fill(
+                                                LinearGradient(
+                                                    gradient: Gradient(colors: [
+                                                        session.backgroundColor.opacity(0.8),
+                                                        session.backgroundColor.opacity(0.6)
+                                                    ]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                            )
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                } else {
+                    // Exercise in progress
+                    VStack(spacing: 32) {
+                        Spacer()
+                        
+                        // Breathing circle
+                        ZStack {
+                            // Outer ring
+                            Circle()
+                                .stroke(Color.white.opacity(0.2), lineWidth: 4)
+                                .frame(width: 280, height: 280)
+                            
+                            // Animated circle
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        gradient: Gradient(colors: [
+                                            currentPhase.color.opacity(0.6),
+                                            currentPhase.color.opacity(0.2),
+                                            Color.clear
+                                        ]),
+                                        center: .center,
+                                        startRadius: 20,
+                                        endRadius: 140
+                                    )
+                                )
+                                .frame(width: animatedCircleSize, height: animatedCircleSize)
+                                .animation(.easeInOut(duration: Double(timeRemaining)), value: animatedCircleSize)
+                            
+                            // Center content
+                            VStack(spacing: 8) {
+                                Text(currentPhase.instruction)
+                                    .font(.title.weight(.bold))
+                                    .foregroundColor(.white)
+                                
+                                Text("\(timeRemaining)")
+                                    .font(.largeTitle.weight(.bold))
+                                    .foregroundColor(.white)
+                                    .monospacedDigit()
+                                
+                                Text("seconds")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                        }
+                        
+                        // Progress indicator
+                        VStack(spacing: 12) {
+                            HStack {
+                                Text("Cycle \(completedCycles + 1) of \(totalCycles)")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.white.opacity(0.8))
+                                
+                                Spacer()
+                                
+                                Text("\(Int((Double(completedCycles) + currentCycleProgress) / Double(totalCycles) * 100))%")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            
+                            ProgressView(value: Double(completedCycles) + currentCycleProgress, total: Double(totalCycles))
+                                .progressViewStyle(LinearProgressViewStyle(tint: .white))
+                                .scaleEffect(x: 1, y: 2, anchor: .center)
+                        }
+                        .padding(.horizontal, 24)
+                        
+                        Spacer()
+                    }
+                }
+                
+                // Claim boost button (only shown when exercise is complete)
+                if canClaimBoost {
+                    VStack(spacing: 16) {
+                        Text("Exercise Complete!")
+                            .font(.title2.weight(.semibold))
+                            .foregroundColor(.white)
+                        
+                        ZStack {
+                            // Electric glow effect
+                            if showElectricGlow {
+                                RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                    .fill(
+                                        RadialGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(red: 1.0, green: 0.95, blue: 0.6),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.4),
+                                                Color.clear
+                                            ]),
+                                            center: .center,
+                                            startRadius: 0,
+                                            endRadius: 120
+                                        )
+                                    )
+                                    .frame(width: 250, height: 80)
+                                    .blur(radius: 25)
+                                    .scaleEffect(showElectricGlow ? 1.5 : 0.5)
+                                    .opacity(showElectricGlow ? 1.0 : 0.0)
+                                    .animation(.easeInOut(duration: 0.6), value: showElectricGlow)
+                            }
+                            
+                            Button(action: claimBoost) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: (isClaimingBoost || hasClaimedBoost) ? "bolt.fill" : "plus.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                        .rotationEffect(.degrees(isClaimingBoost ? 360 : 0))
+                                        .animation(.easeInOut(duration: 0.5), value: isClaimingBoost)
+                                    
+                                    Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Claim Boost +\(selectedDifficulty.boostPoints)")
+                                        .font(.headline.weight(.semibold))
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                }
+                                .padding(.vertical, 16)
+                                .padding(.horizontal, 32)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.8),
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.6) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.6)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                                .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
+                            }
+                            .disabled(isClaimingBoost)
+                            .buttonStyle(PlainButtonStyle())
+                            .contentShape(Rectangle())
+                            .simultaneousGesture(
+                                TapGesture()
+                                    .onEnded { _ in
+                                        if !isClaimingBoost {
+                                            claimBoost()
+                                        }
+                                    }
+                            )
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 32)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+    }
+    
+    private var animatedCircleSize: CGFloat {
+        switch currentPhase {
+        case .inhale:
+            return 280
+        case .hold:
+            return 280
+        case .exhale:
+            return 100
+        case .rest:
+            return 100
+        }
+    }
+    
+    private func startExercise() {
+        isExercising = true
+        canClaimBoost = false
+        completedCycles = 0
+        totalCycles = 4 // 4 cycles for a complete exercise
+        
+        startBreathingCycle()
+    }
+    
+    private func startBreathingCycle() {
+        currentPhase = .inhale
+        timeRemaining = selectedDifficulty.inhaleTime
+        startTimer()
+    }
+    
+    private func startTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            timeRemaining -= 1
+            updateProgress()
+            
+            if timeRemaining <= 0 {
+                nextPhase()
+            }
+        }
+    }
+    
+    private func updateProgress() {
+        let totalPhaseTime = selectedDifficulty.inhaleTime + selectedDifficulty.holdTime + selectedDifficulty.exhaleTime + 2 // +2 for rest
+        let currentPhaseTime = getCurrentPhaseTime()
+        let elapsedInPhase = currentPhaseTime - timeRemaining
+        let totalElapsed = (completedCycles * totalPhaseTime) + elapsedInPhase
+        let totalTime = totalCycles * totalPhaseTime
+        
+        currentCycleProgress = Double(totalElapsed) / Double(totalTime)
+    }
+    
+    private func getCurrentPhaseTime() -> Int {
+        switch currentPhase {
+        case .inhale: return selectedDifficulty.inhaleTime
+        case .hold: return selectedDifficulty.holdTime
+        case .exhale: return selectedDifficulty.exhaleTime
+        case .rest: return 2
+        }
+    }
+    
+    private func nextPhase() {
+        switch currentPhase {
+        case .inhale:
+            currentPhase = .hold
+            timeRemaining = selectedDifficulty.holdTime
+        case .hold:
+            currentPhase = .exhale
+            timeRemaining = selectedDifficulty.exhaleTime
+        case .exhale:
+            currentPhase = .rest
+            timeRemaining = 2 // 2 second rest
+        case .rest:
+            completedCycles += 1
+            if completedCycles >= totalCycles {
+                completeExercise()
+            } else {
+                startBreathingCycle()
+            }
+        }
+    }
+    
+    private func completeExercise() {
+        timer?.invalidate()
+        timer = nil
+        isExercising = false
+        canClaimBoost = true
+    }
+    
+    
+    private func claimBoost() {
+        // Start animation
+        isClaimingBoost = true
+        showElectricGlow = true
+        
+        // Multiple haptic feedback for more vibration
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        // Additional vibration sequence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            impactFeedback.impactOccurred()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            impactFeedback.impactOccurred()
+        }
+        
+        // Stop glow after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            showElectricGlow = false
+        }
+        
+            // Set permanent claimed state with additional vibration
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                isClaimingBoost = false
+                hasClaimedBoost = true
+                
+                // Additional vibration for transition to permanent state
+                let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                impactFeedback.impactOccurred()
+            }
+        
+        // TODO: Implement boost claiming logic
+        print("🎯 Breathing boost claimed! +\(selectedDifficulty.boostPoints) points")
+        // This could trigger:
+        // - Add points to user profile
+        // - Show success animation
+        // - Navigate back or show next exercise
+    }
+}
+
+// MARK: - Grounding Exercise View
+private struct GroundingExerciseView: View {
+    let session: ToolSession
+    
+    @State private var currentCardIndex = 0
+    @State private var checkedItems: [Int: Set<Int>] = [:]
+    @State private var showClaimButton = false
+    @State private var cardOffsets: [CGFloat] = [0, 20, 40, 60, 80]
+    @State private var isClaimingBoost = false
+    @State private var showElectricGlow = false
+    @State private var hasClaimedBoost = false
+    
+    private let groundingSteps = [
+        GroundingStep(title: "5 things you can see", itemCount: 5),
+        GroundingStep(title: "4 things you can touch", itemCount: 4),
+        GroundingStep(title: "3 things you can hear", itemCount: 3),
+        GroundingStep(title: "2 things you can smell", itemCount: 2),
+        GroundingStep(title: "1 thing you can taste", itemCount: 1)
+    ]
+    
+    struct GroundingStep {
+        let title: String
+        let itemCount: Int
+    }
+    
+    var body: some View {
+        ZStack {
+            // Use the same GradientBackground as the main Boosts page
+            GradientBackground()
+            
+            VStack {
+                Spacer()
+                
+                // Card stack
+                ZStack {
+                    // Claim Boost button (behind all cards)
+                    if showClaimButton {
+                        ZStack {
+                            // Electric glow effect
+                            if showElectricGlow {
+                                RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                    .fill(
+                                        RadialGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(red: 1.0, green: 0.95, blue: 0.6),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8),
+                                                Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.4),
+                                                Color.clear
+                                            ]),
+                                            center: .center,
+                                            startRadius: 0,
+                                            endRadius: 120
+                                        )
+                                    )
+                                    .frame(width: 250, height: 80)
+                                    .blur(radius: 25)
+                                    .scaleEffect(showElectricGlow ? 1.5 : 0.5)
+                                    .opacity(showElectricGlow ? 1.0 : 0.0)
+                                    .animation(.easeInOut(duration: 0.6), value: showElectricGlow)
+                            }
+                            
+                            Button(action: claimBoost) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: (isClaimingBoost || hasClaimedBoost) ? "bolt.fill" : "plus.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                        .rotationEffect(.degrees(isClaimingBoost ? 360 : 0))
+                                        .animation(.easeInOut(duration: 0.5), value: isClaimingBoost)
+                                    
+                                    Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Claim Boost +3")
+                                        .font(.title2.weight(.semibold))
+                                        .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                }
+                                .padding(.vertical, 20)
+                                .padding(.horizontal, 40)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.8),
+                                                    (isClaimingBoost || hasClaimedBoost) ? 
+                                                    Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.6) :
+                                                    Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.6)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                                .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
+                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
+                            }
+                            .disabled(isClaimingBoost)
+                            .buttonStyle(PlainButtonStyle())
+                            .contentShape(Rectangle())
+                            .simultaneousGesture(
+                                TapGesture()
+                                    .onEnded { _ in
+                                        if !isClaimingBoost {
+                                            claimBoost()
+                                        }
+                                    }
+                            )
+                        }
+                        .scaleEffect(showClaimButton ? 1.0 : 0.8)
+                        .opacity(showClaimButton ? 1.0 : 0.0)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: showClaimButton)
+                    }
+                    
+                    // Current card only
+                    if currentCardIndex < groundingSteps.count {
+                        GroundingCard(
+                            step: groundingSteps[currentCardIndex],
+                            cardIndex: currentCardIndex,
+                            checkedItems: checkedItems[currentCardIndex] ?? [],
+                            onItemChecked: { itemIndex in
+                                checkItem(cardIndex: currentCardIndex, itemIndex: itemIndex)
+                            }
+                        )
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing).combined(with: .opacity),
+                            removal: .move(edge: .leading).combined(with: .opacity)
+                        ))
+                        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentCardIndex)
+                    }
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 24)
+        }
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
+    }
+    
+    private func checkItem(cardIndex: Int, itemIndex: Int) {
+        if checkedItems[cardIndex] == nil {
+            checkedItems[cardIndex] = Set<Int>()
+        }
+        checkedItems[cardIndex]?.insert(itemIndex)
+        
+        // Check if all items in current card are checked
+        if let checked = checkedItems[cardIndex], checked.count == groundingSteps[cardIndex].itemCount {
+            // Move to next card after a brief delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if cardIndex < groundingSteps.count - 1 {
+                    currentCardIndex += 1
+                } else {
+                    // All cards completed, hide the last card and show claim button
+                    currentCardIndex = groundingSteps.count // This will hide the card
+                    showClaimButton = true
+                }
+            }
+        }
+    }
+    
+    private func claimBoost() {
+        // Start animation
+        isClaimingBoost = true
+        showElectricGlow = true
+        
+        // Multiple haptic feedback for more vibration
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        // Additional vibration sequence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            impactFeedback.impactOccurred()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            impactFeedback.impactOccurred()
+        }
+        
+        // Stop glow after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            showElectricGlow = false
+        }
+        
+            // Set permanent claimed state with additional vibration
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                isClaimingBoost = false
+                hasClaimedBoost = true
+                
+                // Additional vibration for transition to permanent state
+                let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                impactFeedback.impactOccurred()
+            }
+        
+        // TODO: Implement boost claiming logic
+        print("🎯 Grounding boost claimed! +3 points")
+    }
+}
+
+private struct GroundingCard: View {
+    let step: GroundingExerciseView.GroundingStep
+    let cardIndex: Int
+    let checkedItems: Set<Int>
+    let onItemChecked: (Int) -> Void
+    
+    var body: some View {
+        VStack(spacing: 32) {
+            // Title
+            Text(step.title)
+                .font(.title.weight(.bold))
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+            
+            // Numbered mini cards
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: 2), spacing: 16) {
+                ForEach(0..<step.itemCount, id: \.self) { index in
+                    Button(action: {
+                        onItemChecked(index)
+                    }) {
+                        ZStack {
+                            // Mini card background
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(checkedItems.contains(index) ? Color.green : Color.clear)
+                                .frame(width: 80, height: 80)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(checkedItems.contains(index) ? Color.green : Color.gray, lineWidth: 2)
+                                )
+                            
+                            // Number
+                            Text("\(index + 1)")
+                                .font(.title.weight(.bold))
+                                .foregroundColor(checkedItems.contains(index) ? .white : .primary)
+                            
+                            // Checkmark overlay
+                            if checkedItems.contains(index) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.green)
+                                            .frame(width: 24, height: 24)
+                                    )
+                                    .offset(x: 25, y: -25)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(checkedItems.contains(index))
+                }
+            }
+        }
+        .padding(32)
+        .background(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .background(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.white.opacity(0.25),
+                                    Color.white.opacity(0.1)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .strokeBorder(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.white.opacity(0.4),
+                                    Color.white.opacity(0.1),
+                                    Color.white.opacity(0.2)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
+                        )
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: Color.black.opacity(0.1), radius: 30, x: 0, y: 15)
+        .shadow(color: Color.white.opacity(0.1), radius: 1, x: 0, y: 1)
+    }
+}
+
+
+
+private struct PushupsExerciseView: View {
+    let session: ToolSession
+    
+    @State private var selectedDifficulty: PushupsDifficulty = .beginner
+    @State private var isClaimingBoost = false
+    @State private var showElectricGlow = false
+    @State private var hasClaimedBoost = false
+    
+    enum PushupsDifficulty: CaseIterable {
+        case beginner, intermediate
+        
+        var title: String {
+            switch self {
+            case .beginner: return "10 Pushups"
+            case .intermediate: return "25 Pushups"
+            }
+        }
+        
+        var boostPoints: Int {
+            switch self {
+            case .beginner: return 1
+            case .intermediate: return 3
+            }
+        }
+        
+        var description: String {
+            switch self {
+            case .beginner: return "Perfect for getting started"
+            case .intermediate: return "Challenge yourself"
+            }
+        }
+    }
+    
+    private var buttonGradient: LinearGradient {
+        let isClaimed = isClaimingBoost || hasClaimedBoost
+        let topColor = isClaimed ? 
+            Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8) :
+            Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.8)
+        let bottomColor = isClaimed ? 
+            Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.6) :
+            Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.6)
+        
+        return LinearGradient(
+            gradient: Gradient(colors: [topColor, bottomColor]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 32) {
+                // Header
+                VStack(spacing: 16) {
+                    Text("⚡ Pushups Boost")
+                        .font(.largeTitle.weight(.bold))
+                        .foregroundColor(.white)
+                    
+                    Text("A quick strength burst to recharge energy.")
+                        .font(.title3)
+                        .foregroundColor(.white.opacity(0.9))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, 20)
+                
+                // Exercise Description
+                VStack(spacing: 12) {
+                    Text("Exercise Description")
+                        .font(.headline.weight(.semibold))
+                        .foregroundColor(.white)
+                    
+                    Text("Movement changes mood — start with just a few pushups.")
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.8))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+                }
+                .padding(.vertical, 20)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.4),
+                                            Color.white.opacity(0.1),
+                                            Color.white.opacity(0.2)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 1.5
+                                )
+                        )
+                )
+                
+                // Rep Options
+                VStack(spacing: 16) {
+                    Text("Choose Your Challenge")
+                        .font(.headline.weight(.semibold))
+                        .foregroundColor(.white)
+                    
+                    ForEach(PushupsDifficulty.allCases, id: \.self) { difficulty in
+                        Button(action: {
+                            selectedDifficulty = difficulty
+                        }) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(difficulty.title)
+                                        .font(.headline.weight(.semibold))
+                                        .foregroundColor(.white)
+                                    
+                                    Text(difficulty.description)
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                
+                                Spacer()
+                                
+                                Text("+\(difficulty.boostPoints) Boost")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                            .fill(Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.3))
+                                    )
+                            }
+                            .padding(20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(selectedDifficulty == difficulty ? 
+                                          Color(red: 0.6, green: 0.9, blue: 0.7).opacity(0.2) : 
+                                          .ultraThinMaterial)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            .strokeBorder(
+                                                selectedDifficulty == difficulty ?
+                                                Color(red: 0.6, green: 0.9, blue: 0.7).opacity(0.5) :
+                                                Color.white.opacity(0.2),
+                                                lineWidth: 1.5
+                                            )
+                                    )
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                
+                // Completion Button
+                ZStack {
+                    // Electric glow effect
+                    if showElectricGlow {
+                        RoundedRectangle(cornerRadius: 25, style: .continuous)
+                            .fill(
+                                RadialGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.95, blue: 0.6),
+                                        Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.8),
+                                        Color(red: 1.0, green: 0.95, blue: 0.6).opacity(0.4),
+                                        Color.clear
+                                    ]),
+                                    center: .center,
+                                    startRadius: 0,
+                                    endRadius: 100
+                                )
+                            )
+                            .frame(width: 250, height: 80)
+                            .blur(radius: 20)
+                            .scaleEffect(showElectricGlow ? 1.5 : 0.5)
+                            .opacity(showElectricGlow ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.6), value: showElectricGlow)
+                    }
+                    
+                    Button(action: claimBoost) {
+                        HStack(spacing: 12) {
+                            Image(systemName: (isClaimingBoost || hasClaimedBoost) ? "bolt.fill" : "checkmark.circle.fill")
+                                .font(.title2)
+                                .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                                .rotationEffect(.degrees(isClaimingBoost ? 360 : 0))
+                                .animation(.easeInOut(duration: 0.5), value: isClaimingBoost)
+                            
+                            Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Reps Completed")
+                                .font(.title2.weight(.semibold))
+                                .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
+                        }
+                        .padding(.vertical, 20)
+                        .padding(.horizontal, 40)
+                        .background(
+                            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                .fill(buttonGradient)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                        .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                )
+                        )
+                        .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
+                    }
+                    .disabled(isClaimingBoost)
+                    .buttonStyle(PlainButtonStyle())
+                    .contentShape(Rectangle())
+                    .simultaneousGesture(
+                        TapGesture()
+                            .onEnded { _ in
+                                if !isClaimingBoost {
+                                    claimBoost()
+                                }
+                            }
+                    )
+                }
+                
+                Spacer(minLength: 50)
+            }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 32)
+        }
+        .background(GradientBackground())
+        .navigationTitle(session.title)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func claimBoost() {
+        // Start animation
+        isClaimingBoost = true
+        showElectricGlow = true
+        
+        // Multiple haptic feedback for more vibration
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        // Additional vibration sequence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            impactFeedback.impactOccurred()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            impactFeedback.impactOccurred()
+        }
+        
+        // Stop glow after animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            showElectricGlow = false
+        }
+        
+        // Set permanent claimed state with additional vibration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            isClaimingBoost = false
+            hasClaimedBoost = true
+            
+            // Additional vibration for transition to permanent state
+            let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+            impactFeedback.impactOccurred()
+        }
+        
+        // TODO: Implement boost claiming logic
+        print("🎯 Pushups boost claimed! +\(selectedDifficulty.boostPoints) points")
+        // This could trigger:
+        // - Add points to user profile
+        // - Show success animation
+        // - Update UI to show claimed state
+        // - Navigate back or show next boost
+    }
+}
