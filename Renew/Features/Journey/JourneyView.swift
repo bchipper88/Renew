@@ -56,12 +56,18 @@ struct ToolsView: View {
         switch session.title {
         case "Sound":
             SoundPlayerView(session: session)
+        case "Calm":
+            SoundPlayerView(session: session)
         case "Breathe":
             BreathingExerciseView(session: session)
         case "Grounding":
             GroundingExerciseView(session: session)
         case "Pushups":
             PushupsExerciseView(session: session)
+        case "Squats":
+            SquatsExerciseView(session: session)
+        case "Jumping Jacks":
+            JumpingJacksExerciseView(session: session)
         default:
             // Placeholder for other sessions
             VStack {

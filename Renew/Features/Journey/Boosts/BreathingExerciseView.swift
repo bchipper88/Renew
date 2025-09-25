@@ -25,8 +25,8 @@ struct BreathingExerciseView: View {
         
         var title: String {
             switch self {
-            case .beginner: return "2-8-4 - Boost +1"
-            case .advanced: return "4-16-8 - Boost +3"
+            case .beginner: return "Boost +1"
+            case .advanced: return "Boost +3"
             }
         }
         
