@@ -16,6 +16,8 @@
 		6E4634302E848D21000035E9 /* ToolSessionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4634292E848D21000035E9 /* ToolSessionCard.swift */; };
 		6E4634312E848D21000035E9 /* HorizontalFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4634282E848D21000035E9 /* HorizontalFilterBar.swift */; };
 		6E4634322E848D21000035E9 /* BreathingExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4634212E848D21000035E9 /* BreathingExerciseView.swift */; };
+		6E4634342E84969E000035E9 /* boost.gif in Resources */ = {isa = PBXBuildFile; fileRef = 6E4634332E84969E000035E9 /* boost.gif */; };
+		6E4634362E84A3F1000035E9 /* GuidedBoostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4634352E84A3F1000035E9 /* GuidedBoostView.swift */; };
 		F6A8BC8A2A5B4A9400F87E0E /* RenewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC632A5B4A9400F87E0E /* RenewApp.swift */; };
 		F6A8BC8B2A5B4A9400F87E0E /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC612A5B4A9400F87E0E /* AppContainer.swift */; };
 		F6A8BC8C2A5B4A9400F87E0E /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A8BC622A5B4A9400F87E0E /* AppEnvironment.swift */; };
@@ -51,6 +53,8 @@
 		6E4634272E848D21000035E9 /* FilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButton.swift; sourceTree = "<group>"; };
 		6E4634282E848D21000035E9 /* HorizontalFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalFilterBar.swift; sourceTree = "<group>"; };
 		6E4634292E848D21000035E9 /* ToolSessionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolSessionCard.swift; sourceTree = "<group>"; };
+		6E4634332E84969E000035E9 /* boost.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = boost.gif; sourceTree = "<group>"; };
+		6E4634352E84A3F1000035E9 /* GuidedBoostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedBoostView.swift; sourceTree = "<group>"; };
 		F6A8BC602A5B4A9400F87E0E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		F6A8BC612A5B4A9400F87E0E /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		F6A8BC622A5B4A9400F87E0E /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
@@ -92,6 +96,7 @@
 		6E4634252E848D21000035E9 /* Boosts */ = {
 			isa = PBXGroup;
 			children = (
+				6E4634352E84A3F1000035E9 /* GuidedBoostView.swift */,
 				6E4634212E848D21000035E9 /* BreathingExerciseView.swift */,
 				6E4634222E848D21000035E9 /* GroundingExerciseView.swift */,
 				6E4634232E848D21000035E9 /* PushupsExerciseView.swift */,
@@ -261,6 +266,7 @@
 			children = (
 				6E46341F2E84485A000035E9 /* sound.m4r */,
 				F6A8BC762A5B4A9400F87E0E /* Assets.xcassets */,
+				6E4634332E84969E000035E9 /* boost.gif */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -333,6 +339,7 @@
 			files = (
 				F6A8BC9F2A5B4A9400F87E0E /* Assets.xcassets in Resources */,
 				6E4634202E84485A000035E9 /* sound.m4r in Resources */,
+				6E4634342E84969E000035E9 /* boost.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +376,7 @@
 				F6A8BC8F2A5B4A9400F87E0E /* OnboardingFlowView.swift in Sources */,
 				F6A8BC9D2A5B4A9400F87E0E /* AuthService.swift in Sources */,
 				F6A8BC992A5B4A9400F87E0E /* SubscriptionService.swift in Sources */,
+				6E4634362E84A3F1000035E9 /* GuidedBoostView.swift in Sources */,
 				F6A8BC9B2A5B4A9400F87E0E /* NotificationScheduler.swift in Sources */,
 				F6A8BC972A5B4A9400F87E0E /* Styles.swift in Sources */,
 				F6A8BC9A2A5B4A9400F87E0E /* HabitService.swift in Sources */,

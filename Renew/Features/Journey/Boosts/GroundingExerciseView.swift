@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GroundingExerciseView: View {
+    @Environment(\.dismiss) private var dismiss
     let session: ToolSession
     
     @State private var currentCardIndex = 0
@@ -12,11 +13,11 @@ struct GroundingExerciseView: View {
     @State private var hasClaimedBoost = false
     
     private let groundingSteps = [
-        GroundingStep(title: "5 things you can see", itemCount: 5),
-        GroundingStep(title: "4 things you can touch", itemCount: 4),
-        GroundingStep(title: "3 things you can hear", itemCount: 3),
-        GroundingStep(title: "2 things you can smell", itemCount: 2),
-        GroundingStep(title: "1 thing you can taste", itemCount: 1)
+        GroundingStep(title: "Name 5 things you can see", itemCount: 5),
+        GroundingStep(title: "Name 4 things you can touch", itemCount: 4),
+        GroundingStep(title: "Name 3 things you can hear", itemCount: 3),
+        GroundingStep(title: "Name 2 things you can smell", itemCount: 2),
+        GroundingStep(title: "Name 1 thing you can taste", itemCount: 1)
     ]
     
     struct GroundingStep {
@@ -168,7 +169,12 @@ struct GroundingExerciseView: View {
             isClaimingBoost: $isClaimingBoost,
             showElectricGlow: $showElectricGlow,
             hasClaimedBoost: $hasClaimedBoost,
-            boostPoints: 3
+            boostPoints: 3,
+            onComplete: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    dismiss()
+                }
+            }
         )
     }
 }

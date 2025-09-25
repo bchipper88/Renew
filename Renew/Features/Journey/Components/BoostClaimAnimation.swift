@@ -5,7 +5,8 @@ struct BoostClaimAnimation {
         isClaimingBoost: Binding<Bool>,
         showElectricGlow: Binding<Bool>,
         hasClaimedBoost: Binding<Bool>,
-        boostPoints: Int
+        boostPoints: Int,
+        onComplete: (() -> Void)? = nil
     ) {
         // Start animation
         isClaimingBoost.wrappedValue = true
@@ -37,14 +38,11 @@ struct BoostClaimAnimation {
             // Additional vibration for transition to permanent state
             let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
             impactFeedback.impactOccurred()
+            
+            print("🎯 Boost claimed! +\(boostPoints) points")
+            onComplete?()
         }
         
         // TODO: Implement boost claiming logic
-        print("🎯 Boost claimed! +\(boostPoints) points")
-        // This could trigger:
-        // - Add points to user profile
-        // - Show success animation
-        // - Update UI to show claimed state
-        // - Navigate back or show next boost
     }
 }

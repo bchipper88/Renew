@@ -2,6 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct SoundPlayerView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var isPlaying = false
     @State private var currentTime: TimeInterval = 0
     @State private var duration: TimeInterval = 0
@@ -265,7 +266,7 @@ struct SoundPlayerView: View {
             }
         }
 
-        guard let url = audioURL, let file = foundFile else {
+        guard let originalURL = audioURL, let file = foundFile else {
             print("❌ No audio file found anywhere. Tried: \(possibleFiles)")
             print("📁 Bundle path: \(Bundle.main.bundlePath)")
             print("📁 Bundle resources: \(Bundle.main.resourcePath ?? "nil")")
@@ -273,8 +274,11 @@ struct SoundPlayerView: View {
         }
 
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.allowBluetoothHFP, .allowBluetoothA2DP])
-            try AVAudioSession.sharedInstance().setActive(true)
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playback)
+            try audioSession.setActive(true)
+
+            let url = normalizedURL(for: originalURL)
 
             let player = try AVAudioPlayer(contentsOf: url)
             player.numberOfLoops = 0 // Don't loop - play once and stop
@@ -288,6 +292,27 @@ struct SoundPlayerView: View {
             print("⏱️ Duration: \(duration) seconds")
         } catch {
             print("❌ Error loading audio: \(error)")
+        }
+    }
+
+    private func normalizedURL(for url: URL) -> URL {
+        let ext = url.pathExtension.lowercased()
+        guard ext == "m4r" else { return url }
+
+        let tempDirectory = FileManager.default.temporaryDirectory
+        let tempURL = tempDirectory
+            .appendingPathComponent(url.deletingPathExtension().lastPathComponent + "_temp")
+            .appendingPathExtension("m4a")
+
+        do {
+            if FileManager.default.fileExists(atPath: tempURL.path) {
+                try FileManager.default.removeItem(at: tempURL)
+            }
+            try FileManager.default.copyItem(at: url, to: tempURL)
+            return tempURL
+        } catch {
+            print("⚠️ Failed to normalize m4r file: \(error). Using original URL.")
+            return url
         }
     }
 
@@ -342,7 +367,12 @@ struct SoundPlayerView: View {
             isClaimingBoost: $isClaimingBoost,
             showElectricGlow: $showElectricGlow,
             hasClaimedBoost: $hasClaimedBoost,
-            boostPoints: 3
+            boostPoints: 3,
+            onComplete: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    dismiss()
+                }
+            }
         )
     }
 }

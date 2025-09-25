@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct PushupsExerciseView: View {
+    @Environment(\.dismiss) private var dismiss
     let session: ToolSession
+    
+    private let titleTextColor = Color(red: 0.16, green: 0.23, blue: 0.32)
+    private let bodyTextColor = Color(red: 0.24, green: 0.3, blue: 0.38)
+    private let chipTextColor = Color(red: 0.2, green: 0.26, blue: 0.34)
     
     @State private var selectedDifficulty: PushupsDifficulty = .beginner
     @State private var isClaimingBoost = false
@@ -51,14 +56,33 @@ struct PushupsExerciseView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 32) {
-                headerSection
-                descriptionSection
+            VStack(spacing: 24) {
+                introSection
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(glassPanelBackground(cornerRadius: 28))
+
                 difficultyOptionsSection
+                    .background(
+                        glassPanelBackground(cornerRadius: 28)
+                            .overlay(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.2),
+                                        Color.white.opacity(0.05)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                    )
+
                 completionSection
-                Spacer(minLength: 50)
+                    .padding(.top, 12)
+
+                Spacer(minLength: 40)
             }
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 20)
             .padding(.vertical, 32)
         }
         .background(GradientBackground())
@@ -66,46 +90,36 @@ struct PushupsExerciseView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 
-    private var headerSection: some View {
-        VStack(spacing: 16) {
-            Text("⚡ Pushups Boost")
-                .font(.largeTitle.weight(.bold))
-                .foregroundColor(.white)
+    private var introSection: some View {
+        VStack(alignment: .center, spacing: 16) {
+            VStack(spacing: 8) {
+         
+                Text("Movement changes mood — start with just a few pushups.")
+                    .font(.title3)
+                    .foregroundColor(bodyTextColor.opacity(0.9))
+                    .multilineTextAlignment(.center)
+            }
 
-            Text("A quick strength burst to recharge energy.")
-                .font(.title3)
-                .foregroundColor(.white.opacity(0.9))
-                .multilineTextAlignment(.center)
+          
+
+           
         }
-        .padding(.top, 20)
-    }
-
-    private var descriptionSection: some View {
-        VStack(spacing: 12) {
-            Text("Exercise Description")
-                .font(.headline.weight(.semibold))
-                .foregroundColor(.white)
-
-            Text("Movement changes mood — start with just a few pushups.")
-                .font(.body)
-                .foregroundColor(.white.opacity(0.8))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
-        }
-        .padding(.vertical, 20)
-        .background(exerciseBackground)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 12)
     }
 
     private var difficultyOptionsSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Text("Choose Your Challenge")
                 .font(.headline.weight(.semibold))
-                .foregroundColor(.white)
+                .foregroundColor(titleTextColor)
 
             ForEach(PushupsDifficulty.allCases, id: \.self) { difficulty in
                 difficultyCard(for: difficulty)
             }
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 8)
     }
 
     private var completionSection: some View {
@@ -116,6 +130,7 @@ struct PushupsExerciseView: View {
 
             claimButton
         }
+        .padding(.top, 8)
     }
 
     private var exerciseBackground: some View {
@@ -143,55 +158,93 @@ struct PushupsExerciseView: View {
         let isSelected = selectedDifficulty == difficulty
 
         Button(action: { selectedDifficulty = difficulty }) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(difficulty.title)
                         .font(.headline.weight(.semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(titleTextColor)
 
                     Text(difficulty.description)
                         .font(.caption)
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(bodyTextColor.opacity(0.85))
                 }
 
                 Spacer()
 
                 Text("+\(difficulty.boostPoints) Boost")
                     .font(.subheadline.weight(.semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
+                    .foregroundColor(chipTextColor)
+                    .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                     .background(boostTag)
             }
-            .padding(20)
+            .padding(.vertical, 16)
+            .padding(.horizontal, 18)
             .background(difficultyBackground(isSelected: isSelected))
         }
         .buttonStyle(.plain)
     }
 
-    private var boostTag: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color(red: 0.7, green: 0.85, blue: 1.0).opacity(0.3))
+    private func difficultyBackground(isSelected: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 18, style: .continuous)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: isSelected ?
+                                        [
+                                            Color(red: 0.65, green: 0.9, blue: 0.75).opacity(0.55),
+                                            Color(red: 0.45, green: 0.78, blue: 0.61).opacity(0.45)
+                                        ] :
+                                        [
+                                            Color.white.opacity(0.72),
+                                            Color.white.opacity(0.52)
+                                        ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .strokeBorder(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(isSelected ? 0.85 : 0.45),
+                                Color.white.opacity(isSelected ? 0.35 : 0.18)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.2
+                    )
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 14, x: 0, y: 6)
     }
 
-    private func difficultyBackground(isSelected: Bool) -> some View {
-        RoundedRectangle(cornerRadius: 16, style: .continuous)
-            .fill(isSelected ?
-                  Color(red: 0.6, green: 0.9, blue: 0.7).opacity(0.2) :
-                  Color.clear)
+    private func glassPanelBackground(cornerRadius: CGFloat = 28) -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.32),
+                        Color.white.opacity(0.12)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(.ultraThinMaterial)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .strokeBorder(
-                        isSelected ?
-                        Color(red: 0.6, green: 0.9, blue: 0.7).opacity(0.5) :
-                        Color.white.opacity(0.2),
-                        lineWidth: 1.5
-                    )
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.35), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.12), radius: 28, x: 0, y: 16)
+    }
+
+    private var boostTag: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(Color.white.opacity(0.75))
     }
 
     private var electricGlow: some View {
@@ -218,29 +271,21 @@ struct PushupsExerciseView: View {
 
     private var claimButton: some View {
         Button(action: claimBoost) {
-            HStack(spacing: 12) {
-                Image(systemName: (isClaimingBoost || hasClaimedBoost) ? "bolt.fill" : "checkmark.circle.fill")
-                    .font(.title2)
-                    .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
-                    .rotationEffect(.degrees(isClaimingBoost ? 360 : 0))
-                    .animation(.easeInOut(duration: 0.5), value: isClaimingBoost)
-
-                Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Reps Completed")
-                    .font(.title2.weight(.semibold))
-                    .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : .white)
-            }
-            .padding(.vertical, 20)
-            .padding(.horizontal, 40)
-            .background(
-                RoundedRectangle(cornerRadius: 25, style: .continuous)
-                    .fill(buttonGradient)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 25, style: .continuous)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
-            )
-            .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
+            Text((isClaimingBoost || hasClaimedBoost) ? "POWERED UP!" : "Reps Completed")
+                .font(.title2.weight(.semibold))
+                .foregroundColor((isClaimingBoost || hasClaimedBoost) ? Color(red: 0.2, green: 0.2, blue: 0.2) : titleTextColor)
+                .padding(.vertical, 18)
+                .padding(.horizontal, 30)
+                .background(
+                    RoundedRectangle(cornerRadius: 25, style: .continuous)
+                        .fill(buttonGradient)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                .stroke(Color.white.opacity(0.4), lineWidth: 1)
+                        )
+                )
+                .scaleEffect(isClaimingBoost ? 1.1 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isClaimingBoost)
         }
         .disabled(isClaimingBoost)
         .buttonStyle(PlainButtonStyle())
@@ -260,7 +305,29 @@ struct PushupsExerciseView: View {
             isClaimingBoost: $isClaimingBoost,
             showElectricGlow: $showElectricGlow,
             hasClaimedBoost: $hasClaimedBoost,
-            boostPoints: selectedDifficulty.boostPoints
+            boostPoints: selectedDifficulty.boostPoints,
+            onComplete: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    dismiss()
+                }
+            }
         )
+    }
+}
+
+private extension View {
+    func panelStyle(cornerRadius: CGFloat = 28) -> some View {
+        self
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color.white.opacity(0.85))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .stroke(Color.white.opacity(0.45), lineWidth: 1.1)
+                    )
+                    .shadow(color: Color.black.opacity(0.12), radius: 22, x: 0, y: 12)
+            )
     }
 }

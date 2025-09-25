@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct BreathingExerciseView: View {
+    @Environment(\.dismiss) private var dismiss
     let session: ToolSession
+    
+    private let titleTextColor = Color(red: 0.16, green: 0.23, blue: 0.32)
+    private let bodyTextColor = Color(red: 0.24, green: 0.3, blue: 0.38)
     
     @State private var selectedDifficulty: BreathingDifficulty = .beginner
     @State private var isExercising = false
@@ -21,8 +25,8 @@ struct BreathingExerciseView: View {
         
         var title: String {
             switch self {
-            case .beginner: return "2-8-4 - Claim Boost +1"
-            case .advanced: return "4-16-8 - Claim Boost +3"
+            case .beginner: return "2-8-4 - Boost +1"
+            case .advanced: return "4-16-8 - Boost +3"
             }
         }
         
@@ -88,69 +92,25 @@ struct BreathingExerciseView: View {
                     VStack(spacing: 24) {
                         Text("Choose Your Breathing Exercise")
                             .font(.title2.weight(.semibold))
-                            .foregroundColor(.primary)
+                            .foregroundColor(titleTextColor)
                             .multilineTextAlignment(.center)
+                            .padding(.horizontal, 8)
                         
-                        VStack(spacing: 16) {
+                        VStack(spacing: 18) {
                             ForEach(BreathingDifficulty.allCases, id: \.self) { difficulty in
                                 Button(action: {
                                     selectedDifficulty = difficulty
                                     startExercise()
                                 }) {
-                                    VStack(spacing: 8) {
-                                        Text(difficulty.title)
-                                            .font(.headline.weight(.medium))
-                                            .foregroundColor(.white)
-                                        
-                                        HStack(spacing: 4) {
-                                            Text("Inhale")
-                                                .font(.caption)
-                                            Text("\(difficulty.inhaleTime)s")
-                                                .font(.caption.weight(.semibold))
-                                            
-                                            Text("•")
-                                                .font(.caption)
-                                            
-                                            Text("Hold")
-                                                .font(.caption)
-                                            Text("\(difficulty.holdTime)s")
-                                                .font(.caption.weight(.semibold))
-                                            
-                                            Text("•")
-                                                .font(.caption)
-                                            
-                                            Text("Exhale")
-                                                .font(.caption)
-                                            Text("\(difficulty.exhaleTime)s")
-                                                .font(.caption.weight(.semibold))
-                                        }
-                                        .foregroundColor(.white.opacity(0.8))
-                                    }
-                                    .padding(.vertical, 20)
-                                    .padding(.horizontal, 24)
-                                    .frame(maxWidth: .infinity)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                            .fill(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        session.backgroundColor.opacity(0.8),
-                                                        session.backgroundColor.opacity(0.6)
-                                                    ]),
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                            )
-                                    )
+                                    difficultyCard(for: difficulty)
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 24)
+                    .background(glassPanelBackground())
                     .padding(.horizontal, 24)
                 } else {
                     // Exercise in progress
@@ -406,7 +366,103 @@ struct BreathingExerciseView: View {
             isClaimingBoost: $isClaimingBoost,
             showElectricGlow: $showElectricGlow,
             hasClaimedBoost: $hasClaimedBoost,
-            boostPoints: selectedDifficulty.boostPoints
+            boostPoints: selectedDifficulty.boostPoints,
+            onComplete: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    dismiss()
+                }
+            }
         )
+    }
+    
+    private func difficultyCard(for difficulty: BreathingDifficulty) -> some View {
+        let isSelected = selectedDifficulty == difficulty
+        
+        return HStack(alignment: .center, spacing: 20) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(difficulty.title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundColor(titleTextColor)
+                
+                HStack(spacing: 12) {
+                    timingPill(label: "Inhale", value: "\(difficulty.inhaleTime)s")
+                    timingPill(label: "Hold", value: "\(difficulty.holdTime)s")
+                    timingPill(label: "Exhale", value: "\(difficulty.exhaleTime)s")
+                }
+            }
+            
+            Spacer(minLength: 10)
+            
+            Image(systemName: "play.circle.fill")
+                .font(.title2)
+                .foregroundColor(isSelected ? titleTextColor : bodyTextColor.opacity(0.6))
+        }
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
+        .background(difficultyBackground(isSelected: isSelected))
+    }
+    
+    private func timingPill(label: String, value: String) -> some View {
+        VStack(spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(bodyTextColor.opacity(0.7))
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .foregroundColor(titleTextColor)
+        }
+        .frame(width: 64)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.white.opacity(0.85))
+        )
+    }
+    
+    private func difficultyBackground(isSelected: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 22, style: .continuous)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: isSelected ?
+                                        [
+                                            Color.white.opacity(0.9),
+                                            Color.white.opacity(0.72)
+                                        ] :
+                                        [
+                                            Color.white.opacity(0.7),
+                                            Color.white.opacity(0.5)
+                                        ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(Color.white.opacity(isSelected ? 0.55 : 0.32), lineWidth: 1.1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 14, x: 0, y: 6)
+    }
+    
+    private func glassPanelBackground(cornerRadius: CGFloat = 32) -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            .fill(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.82),
+                        Color.white.opacity(0.6)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color.white.opacity(0.38), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 18, x: 0, y: 10)
     }
 }
